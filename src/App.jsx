@@ -17,6 +17,7 @@ import {
   ChevronDownIcon
 } from '@heroicons/react/24/outline'
 import React from 'react'
+import { track } from '@vercel/analytics'
 
 // Importa il logo e la scritta
 import logoImage from './assets/icon.png'
@@ -111,8 +112,35 @@ function App() {
   const [isSubmitted, setIsSubmitted] = React.useState(false);
   const [submitMessage, setSubmitMessage] = React.useState('');
 
+  // Funzione per smooth scroll con tracking
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+      
+      // 📊 Track navigazione sezioni
+      track('Navigation Click', {
+        section: sectionId,
+        timestamp: new Date().toISOString()
+      });
+    }
+  };
+
   const toggleFAQ = (index) => {
+    const wasOpen = openFAQ === index;
     setOpenFAQ(openFAQ === index ? null : index);
+    
+    // 📊 Track interazione FAQ
+    if (!wasOpen) {
+      track('FAQ Opened', {
+        question_index: index,
+        question: faqData[index]?.question || 'Unknown',
+        timestamp: new Date().toISOString()
+      });
+    }
   };
 
   // Funzione per validare l'email
@@ -145,13 +173,22 @@ function App() {
       
       // Salva in localStorage come backup
       const existingEmails = JSON.parse(localStorage.getItem('gigask-emails') || '[]');
-      if (!existingEmails.some(item => item.email === email)) {
+      const isNewEmail = !existingEmails.some(item => item.email === email);
+      
+      if (isNewEmail) {
         existingEmails.push({
           email: email,
           timestamp: new Date().toISOString(),
           source: 'waiting-list'
         });
         localStorage.setItem('gigask-emails', JSON.stringify(existingEmails));
+        
+        // 📊 Track dell'evento con Vercel Analytics
+        track('Waiting List Signup', {
+          email_domain: email.split('@')[1],
+          total_signups: existingEmails.length,
+          timestamp: new Date().toISOString()
+        });
       }
       
       setIsSubmitted(true);
@@ -204,17 +241,6 @@ function App() {
     }
   ];
 
-  // Funzione per smooth scroll
-  const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }
-  };
-
   // Funzione per visualizzare le email registrate (debug)
   const showRegisteredEmails = () => {
     const emails = JSON.parse(localStorage.getItem('gigask-emails') || '[]');
@@ -222,11 +248,53 @@ function App() {
     alert(`📧 Email registrate: ${emails.length}\n\n${emails.map(item => `${item.email} (${new Date(item.timestamp).toLocaleString()})`).join('\n')}`);
   };
 
-  // Aggiunge funzione globale per debug
+  // Aggiunge funzione globale per debug e tracking
   React.useEffect(() => {
     window.showGigAskEmails = showRegisteredEmails;
     console.log('🎯 GigAsk Landing Page caricata!');
     console.log('💡 Digita "showGigAskEmails()" nella console per vedere le email registrate');
+    
+    // 📊 Track caricamento pagina
+    track('Page Load', {
+      user_agent: navigator.userAgent,
+      viewport_width: window.innerWidth,
+      viewport_height: window.innerHeight,
+      timestamp: new Date().toISOString()
+    });
+    
+    // 📊 Track tempo di permanenza (dopo 30 secondi)
+    const engagementTimer = setTimeout(() => {
+      track('Engagement - 30s', {
+        timestamp: new Date().toISOString()
+      });
+    }, 30000);
+    
+    // 📊 Track scroll profondità
+    const handleScroll = () => {
+      const scrollPercent = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
+      if (scrollPercent >= 50 && !window.scrollTracked50) {
+        window.scrollTracked50 = true;
+        track('Scroll Depth', {
+          depth: '50%',
+          timestamp: new Date().toISOString()
+        });
+      }
+      if (scrollPercent >= 90 && !window.scrollTracked90) {
+        window.scrollTracked90 = true;
+        track('Scroll Depth', {
+          depth: '90%',
+          timestamp: new Date().toISOString()
+        });
+      }
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    
+    // Cleanup
+    return () => {
+      clearTimeout(engagementTimer);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   return (

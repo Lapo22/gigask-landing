@@ -1,9 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 * {
   font-family: 'Inter', system-ui, sans-serif;
 }
@@ -12,4 +8,55 @@ body {
   margin: 0;
   padding: 0;
   line-height: 1.6;
+}
+
+/* Aggiungiamo gli stili per le animazioni che erano nel CSS */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes rocket-flight {
+  0% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-30px) rotate(15deg); }
+  50% { transform: translateY(-60px) rotate(-10deg); }
+  75% { transform: translateY(-30px) rotate(5deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+.float-decoration {
+  animation: float 6s ease-in-out infinite;
+}
+
+.rocket-flight {
+  animation: rocket-flight 3s ease-in-out;
+}
+
+.animate-section {
+  animation: fadeInUp 1s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.icon-pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.logo-hover:hover {
+  transform: scale(1.02);
+  transition: transform 0.3s ease;
 }

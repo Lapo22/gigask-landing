@@ -397,7 +397,7 @@ function App() {
 
             {/* Logo Hero grande - solo icona */}
             <div style={{marginBottom: '1.5rem'}}>
-              <div className="icon-pulse">
+              <div>
                 <GigAskLogo size={100} showText={false} />
               </div>
             </div>
@@ -1884,6 +1884,191 @@ function App() {
           button:hover {
             transform: none !important;
             box-shadow: initial !important;
+          }
+        }
+
+        /* MOBILE RESPONSIVE DESIGN */
+        @media (max-width: 768px) {
+          /* Navigation mobile */
+          nav {
+            padding: 0.8rem 0 !important;
+          }
+          
+          nav > div {
+            padding: 0 1rem !important;
+          }
+          
+          nav > div > div {
+            flex-wrap: wrap !important;
+            gap: 1rem !important;
+          }
+          
+          nav > div > div > div:last-child {
+            display: none !important; /* Nascondi menu nav su mobile */
+          }
+          
+          /* Hero section mobile */
+          section:first-of-type {
+            padding: 3rem 1rem !important;
+          }
+          
+          section:first-of-type h1 {
+            font-size: 2.5rem !important;
+            line-height: 1.2 !important;
+            margin-bottom: 1rem !important;
+          }
+          
+          section:first-of-type p {
+            font-size: 1.1rem !important;
+            margin-bottom: 2rem !important;
+            max-width: none !important;
+            padding: 0 0.5rem !important;
+          }
+          
+          /* Hero form mobile */
+          form {
+            padding: 2rem 1.5rem !important;
+            margin: 0 0.5rem !important;
+          }
+          
+          form > div:first-child {
+            flex-direction: column !important;
+            gap: 1rem !important;
+          }
+          
+          form input {
+            min-width: auto !important;
+            width: 100% !important;
+            font-size: 1rem !important;
+            padding: 1.2rem 1.5rem !important;
+          }
+          
+          form button {
+            width: 100% !important;
+            padding: 1.2rem 2rem !important;
+            font-size: 1rem !important;
+            white-space: normal !important;
+          }
+          
+          form > div:last-child {
+            flex-direction: column !important;
+            gap: 1rem !important;
+            align-items: center !important;
+          }
+          
+          form > div:last-child > div {
+            font-size: 0.9rem !important;
+          }
+          
+          /* Stats mobile */
+          section:first-of-type > div > div:last-child {
+            flex-direction: column !important;
+            gap: 1.5rem !important;
+            margin-top: 2rem !important;
+          }
+          
+          /* General sections mobile */
+          section {
+            padding: 3rem 1rem !important;
+          }
+          
+          section h2 {
+            font-size: 2rem !important;
+            margin-bottom: 1rem !important;
+          }
+          
+          section > div > p {
+            font-size: 1rem !important;
+            margin-bottom: 2rem !important;
+          }
+          
+          /* Grid layouts mobile */
+          section > div > div[style*="grid"] {
+            grid-template-columns: 1fr !important;
+            gap: 1.5rem !important;
+          }
+          
+          /* Cards mobile */
+          section > div > div[style*="grid"] > div {
+            padding: 1.5rem !important;
+            margin: 0 0.5rem !important;
+          }
+          
+          section > div > div[style*="grid"] > div h3 {
+            font-size: 1.3rem !important;
+          }
+          
+          section > div > div[style*="grid"] > div p {
+            font-size: 0.95rem !important;
+          }
+          
+          /* Benefits section mobile */
+          section:nth-of-type(3) > div > div[style*="grid"] {
+            grid-template-columns: 1fr !important;
+          }
+          
+          section:nth-of-type(3) > div > div[style*="grid"] > div {
+            text-align: center !important;
+            padding: 2rem 1.5rem !important;
+          }
+          
+          section:nth-of-type(3) > div > div[style*="grid"] > div > div:first-child {
+            margin: 0 auto 1rem !important;
+          }
+          
+          /* FAQ mobile */
+          section:nth-of-type(5) > div > div > div {
+            margin-bottom: 1rem !important;
+          }
+          
+          section:nth-of-type(5) > div > div > div > div:first-child {
+            padding: 1.2rem !important;
+            font-size: 1rem !important;
+          }
+          
+          section:nth-of-type(5) > div > div > div > div:last-child {
+            padding: 1.2rem !important;
+            font-size: 0.95rem !important;
+          }
+          
+          /* Footer mobile */
+          footer {
+            padding: 2rem 1rem !important;
+          }
+          
+          footer > div {
+            flex-direction: column !important;
+            gap: 1.5rem !important;
+            text-align: center !important;
+          }
+          
+          /* Floating decorations - hide on mobile */
+          .float-decoration {
+            display: none !important;
+          }
+        }
+        
+        @media (max-width: 480px) {
+          /* Extra small screens */
+          section:first-of-type h1 {
+            font-size: 2rem !important;
+          }
+          
+          section:first-of-type p {
+            font-size: 1rem !important;
+          }
+          
+          form {
+            padding: 1.5rem 1rem !important;
+            margin: 0 0.25rem !important;
+          }
+          
+          section h2 {
+            font-size: 1.8rem !important;
+          }
+          
+          section > div > div[style*="grid"] > div {
+            padding: 1.2rem !important;
           }
         }
 

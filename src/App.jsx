@@ -329,8 +329,8 @@ function App() {
               </a>
               <a href="#waiting-list" style={{color: '#666', textDecoration: 'none', fontWeight: '500'}} onClick={() => scrollToSection('waiting-list')}>
                 Unisciti alla lista
-              </a>
-            </div>
+        </a>
+      </div>
           </div>
         </div>
       </nav>
@@ -392,7 +392,7 @@ function App() {
               >
                 🚀
               </span>
-              In arrivo nel 2024
+              In arrivo prossimamente
             </div>
 
             {/* Logo Hero grande - solo icona */}
@@ -416,7 +416,7 @@ function App() {
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
                 textShadow: 'none'
-              }} className="text-shimmer">piccoli lavori</span>{' '}
+              }} className="text-shimmer">lavori occasionali</span>{' '}
               in Italia
             </h1>
             <p style={{
@@ -427,7 +427,7 @@ function App() {
               margin: '0 auto 2rem',
               textShadow: '0 2px 10px rgba(0,0,0,0.2)'
             }}>
-              Connetti chi cerca piccoli lavori con chi ha bisogno di aiuto. 
+              Connetti chi cerca lavori occasionali con chi ha bisogno di aiuto. 
               Semplice, veloce e sicuro. <strong>Sii tra i primi a provarla!</strong>
             </p>
             
@@ -490,7 +490,7 @@ function App() {
                   {isSubmitting ? '⏳ Invio...' : 
                    isSubmitted ? '✅ Registrato!' : 
                    '🎯 Unisciti ora'}
-                </button>
+        </button>
               </div>
               
               {/* Messaggio di feedback */}
@@ -632,7 +632,7 @@ function App() {
                   transition: 'all 0.3s ease'
                 }} className="step-icon-animation">
                   <HandRaisedIcon style={{width: '1.8rem', height: '1.8rem', color: 'white'}} />
-                </div>
+      </div>
                 <h4 style={{fontSize: '1.3rem', fontWeight: '700', marginBottom: '0.8rem', color: '#1a1a1a'}}>
                   1. Pubblica il tuo Gig
                 </h4>
@@ -838,7 +838,7 @@ function App() {
             maxWidth: '600px',
             margin: '0 auto 4rem'
           }}>
-            Sarà la prima piattaforma italiana pensata specificamente per piccoli lavori
+            Sarà la prima piattaforma italiana pensata specificamente per lavori occasionali
           </p>
           <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '3rem'}}>
             {/* Per chi cerca lavoro */}
@@ -1279,12 +1279,12 @@ function App() {
         <div style={containerStyle}>
           <div style={{textAlign: 'center'}}>
             <div style={{marginBottom: '2rem'}}>
-              <div className="icon-pulse">
+              <div>
                 <GigAskLogo size={60} showText={false} />
               </div>
             </div>
             <p style={{color: '#b0bec5', marginBottom: '1.5rem', fontSize: '1.2rem'}}>
-              La prima piattaforma italiana per piccoli lavori - In arrivo nel 2024
+              La prima piattaforma italiana per lavori occasionali - In arrivo prossimamente
             </p>
             <p style={{color: '#78909c', fontSize: '1rem'}}>
               © 2024 GigAsk. Tutti i diritti riservati.
@@ -1887,148 +1887,216 @@ function App() {
           }
         }
 
-        /* MOBILE RESPONSIVE DESIGN */
-        @media (max-width: 768px) {
-          /* Navigation mobile */
+        /* MOBILE RESPONSIVE DESIGN - COMPLETE OVERHAUL */
+        @media screen and (max-width: 768px) {
+          /* Reset base styles for mobile */
+          * {
+            box-sizing: border-box !important;
+          }
+          
+          /* Container adjustments */
+          body {
+            overflow-x: hidden !important;
+          }
+          
+          /* Navigation mobile - completely hidden */
+          nav div div:last-child {
+            display: none !important;
+          }
+          
           nav {
-            padding: 0.8rem 0 !important;
+            padding: 1rem 0 !important;
           }
           
           nav > div {
             padding: 0 1rem !important;
+            max-width: 100% !important;
           }
           
-          nav > div > div {
-            flex-wrap: wrap !important;
-            gap: 1rem !important;
-          }
-          
-          nav > div > div > div:last-child {
-            display: none !important; /* Nascondi menu nav su mobile */
-          }
-          
-          /* Hero section mobile */
+          /* Hero section - complete mobile redesign */
           section:first-of-type {
-            padding: 3rem 1rem !important;
+            padding: 2rem 1rem !important;
+            min-height: auto !important;
           }
           
+          /* Logo size mobile */
+          section:first-of-type img {
+            max-width: 80px !important;
+            height: auto !important;
+          }
+          
+          /* Hero title mobile */
           section:first-of-type h1 {
-            font-size: 2.5rem !important;
-            line-height: 1.2 !important;
-            margin-bottom: 1rem !important;
+            font-size: 2.2rem !important;
+            line-height: 1.3 !important;
+            margin: 1rem 0 !important;
+            padding: 0 1rem !important;
+            text-align: center !important;
           }
           
-          section:first-of-type p {
-            font-size: 1.1rem !important;
-            margin-bottom: 2rem !important;
-            max-width: none !important;
-            padding: 0 0.5rem !important;
+          /* Hero subtitle mobile */
+          section:first-of-type > div > div > p {
+            font-size: 1rem !important;
+            line-height: 1.5 !important;
+            margin: 1rem auto 2rem !important;
+            padding: 0 1rem !important;
+            max-width: 100% !important;
           }
           
-          /* Hero form mobile */
+          /* Form mobile - complete rebuild */
           form {
-            padding: 2rem 1.5rem !important;
-            margin: 0 0.5rem !important;
+            padding: 1.5rem 1rem !important;
+            margin: 0 1rem !important;
+            max-width: calc(100% - 2rem) !important;
+            width: auto !important;
+            border-radius: 1rem !important;
+            box-sizing: border-box !important;
+            display: block !important;
           }
           
+          /* Form centering fix */
+          section:first-of-type form {
+            margin-left: auto !important;
+            margin-right: auto !important;
+            text-align: center !important;
+          }
+          
+          /* Form inputs container */
           form > div:first-child {
             flex-direction: column !important;
             gap: 1rem !important;
+            width: 100% !important;
           }
           
-          form input {
+          /* Email input mobile */
+          form input[type="email"] {
+            width: 100% !important;
             min-width: auto !important;
-            width: 100% !important;
+            max-width: 100% !important;
+            padding: 1rem 1.5rem !important;
             font-size: 1rem !important;
-            padding: 1.2rem 1.5rem !important;
+            border-radius: 1rem !important;
+            box-sizing: border-box !important;
           }
           
-          form button {
+          /* Submit button mobile */
+          form button[type="submit"] {
             width: 100% !important;
-            padding: 1.2rem 2rem !important;
+            padding: 1rem 2rem !important;
             font-size: 1rem !important;
+            border-radius: 1rem !important;
             white-space: normal !important;
+            text-align: center !important;
           }
           
+          /* Form features mobile */
           form > div:last-child {
             flex-direction: column !important;
-            gap: 1rem !important;
+            gap: 0.8rem !important;
             align-items: center !important;
+            text-align: center !important;
           }
           
           form > div:last-child > div {
-            font-size: 0.9rem !important;
+            font-size: 0.85rem !important;
+            justify-content: center !important;
           }
           
-          /* Stats mobile */
+          /* Stats section mobile */
           section:first-of-type > div > div:last-child {
             flex-direction: column !important;
-            gap: 1.5rem !important;
+            gap: 1rem !important;
             margin-top: 2rem !important;
+            padding: 0 1rem !important;
           }
           
-          /* General sections mobile */
-          section {
-            padding: 3rem 1rem !important;
-          }
-          
-          section h2 {
-            font-size: 2rem !important;
-            margin-bottom: 1rem !important;
-          }
-          
-          section > div > p {
-            font-size: 1rem !important;
-            margin-bottom: 2rem !important;
-          }
-          
-          /* Grid layouts mobile */
-          section > div > div[style*="grid"] {
-            grid-template-columns: 1fr !important;
-            gap: 1.5rem !important;
-          }
-          
-          /* Cards mobile */
-          section > div > div[style*="grid"] > div {
-            padding: 1.5rem !important;
-            margin: 0 0.5rem !important;
-          }
-          
-          section > div > div[style*="grid"] > div h3 {
-            font-size: 1.3rem !important;
-          }
-          
-          section > div > div[style*="grid"] > div p {
-            font-size: 0.95rem !important;
-          }
-          
-          /* Benefits section mobile */
-          section:nth-of-type(3) > div > div[style*="grid"] {
-            grid-template-columns: 1fr !important;
-          }
-          
-          section:nth-of-type(3) > div > div[style*="grid"] > div {
+          /* Stats items mobile */
+          section:first-of-type > div > div:last-child > div {
             text-align: center !important;
-            padding: 2rem 1.5rem !important;
+            padding: 0.5rem !important;
           }
           
-          section:nth-of-type(3) > div > div[style*="grid"] > div > div:first-child {
-            margin: 0 auto 1rem !important;
+          /* All sections mobile */
+          section {
+            padding: 2rem 1rem !important;
           }
           
-          /* FAQ mobile */
-          section:nth-of-type(5) > div > div > div {
+          /* Section titles mobile */
+          section h2 {
+            font-size: 1.8rem !important;
+            line-height: 1.3 !important;
+            text-align: center !important;
             margin-bottom: 1rem !important;
+            padding: 0 1rem !important;
           }
           
-          section:nth-of-type(5) > div > div > div > div:first-child {
-            padding: 1.2rem !important;
-            font-size: 1rem !important;
-          }
-          
-          section:nth-of-type(5) > div > div > div > div:last-child {
-            padding: 1.2rem !important;
+          /* Section descriptions mobile */
+          section > div > p {
             font-size: 0.95rem !important;
+            line-height: 1.5 !important;
+            text-align: center !important;
+            margin-bottom: 2rem !important;
+            padding: 0 1rem !important;
+          }
+          
+          /* All grids to single column */
+          div[style*="grid-template-columns"] {
+            grid-template-columns: 1fr !important;
+            gap: 1rem !important;
+            padding: 0 1rem !important;
+          }
+          
+          /* All cards mobile */
+          div[style*="padding: 2.5rem"] {
+            padding: 1.5rem !important;
+            margin: 0.5rem 0 !important;
+            border-radius: 1rem !important;
+          }
+          
+          /* Card titles mobile */
+          div[style*="padding: 2.5rem"] h3 {
+            font-size: 1.2rem !important;
+            margin-bottom: 0.8rem !important;
+            text-align: center !important;
+          }
+          
+          /* Card text mobile */
+          div[style*="padding: 2.5rem"] p {
+            font-size: 0.9rem !important;
+            line-height: 1.4 !important;
+            text-align: center !important;
+          }
+          
+          /* Benefits section specific */
+          section:nth-child(4) div[style*="grid"] > div {
+            text-align: center !important;
+            padding: 1.5rem 1rem !important;
+          }
+          
+          /* Benefits icons mobile */
+          section:nth-child(4) div[style*="grid"] > div > div:first-child {
+            margin: 0 auto 1rem !important;
+            display: flex !important;
+            justify-content: center !important;
+          }
+          
+          /* FAQ section mobile */
+          section:nth-child(6) > div > div > div {
+            margin-bottom: 0.8rem !important;
+          }
+          
+          /* FAQ questions mobile */
+          div[style*="cursor: pointer"] {
+            padding: 1rem !important;
+            font-size: 0.95rem !important;
+            text-align: left !important;
+          }
+          
+          /* FAQ answers mobile */
+          div[style*="padding: 1.5rem"] {
+            padding: 1rem !important;
+            font-size: 0.9rem !important;
+            line-height: 1.4 !important;
           }
           
           /* Footer mobile */
@@ -2038,37 +2106,45 @@ function App() {
           
           footer > div {
             flex-direction: column !important;
-            gap: 1.5rem !important;
+            gap: 1rem !important;
             text-align: center !important;
+            align-items: center !important;
           }
           
-          /* Floating decorations - hide on mobile */
+          /* Hide decorative elements */
+          div[style*="position: absolute"] {
+            display: none !important;
+          }
+          
           .float-decoration {
             display: none !important;
           }
         }
         
-        @media (max-width: 480px) {
-          /* Extra small screens */
+        /* Extra small screens */
+        @media screen and (max-width: 480px) {
           section:first-of-type h1 {
-            font-size: 2rem !important;
+            font-size: 1.8rem !important;
+            padding: 0 0.5rem !important;
           }
           
-          section:first-of-type p {
-            font-size: 1rem !important;
+          section:first-of-type > div > div > p {
+            font-size: 0.9rem !important;
+            padding: 0 0.5rem !important;
           }
           
           form {
-            padding: 1.5rem 1rem !important;
-            margin: 0 0.25rem !important;
+            margin: 0 0.5rem !important;
+            padding: 1rem 0.8rem !important;
           }
           
           section h2 {
-            font-size: 1.8rem !important;
+            font-size: 1.6rem !important;
+            padding: 0 0.5rem !important;
           }
           
-          section > div > div[style*="grid"] > div {
-            padding: 1.2rem !important;
+          div[style*="padding: 2.5rem"] {
+            padding: 1rem !important;
           }
         }
 

@@ -2085,9 +2085,6 @@ function App() {
             border-radius: 1rem !important;
             box-sizing: border-box !important;
             display: block !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
-            position: relative !important;
           }
           
           /* Form centering fix - enhanced */
@@ -2096,9 +2093,6 @@ function App() {
             margin-left: auto !important;
             margin-right: auto !important;
             text-align: center !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
-            position: relative !important;
           }
           
           /* Form inputs container */
@@ -2313,9 +2307,6 @@ function App() {
             margin: 0 auto !important;
             padding: 1rem 0.8rem !important;
             max-width: calc(100% - 0.5rem) !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
-            position: relative !important;
           }
           
           section h2 {
@@ -2332,6 +2323,12 @@ function App() {
           section:nth-last-child(2) > div {
             padding: 0 0.25rem !important;
             max-width: 100% !important;
+            overflow-x: hidden !important;
+          }
+          
+          /* Body overflow fix for mobile */
+          body {
+            overflow-x: hidden !important;
           }
         }
 

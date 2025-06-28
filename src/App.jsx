@@ -177,7 +177,19 @@ function App() {
     try {
       // 🔍 Controlla duplicati PRIMA di inviare a Formspree
       const existingEmails = JSON.parse(localStorage.getItem('gigask-emails') || '[]');
-      const isNewEmail = !existingEmails.some(item => item.email === email);
+      console.log('🔍 Debug duplicati:', {
+        emailDaControllare: email,
+        emailsEsistenti: existingEmails,
+        numeroEmails: existingEmails.length
+      });
+      
+      const isNewEmail = !existingEmails.some(item => {
+        const isDuplicate = item.email === email;
+        console.log(`🔍 Confronto: "${item.email}" === "${email}" → ${isDuplicate}`);
+        return isDuplicate;
+      });
+      
+      console.log('🔍 Risultato check:', { isNewEmail, emailTrovata: !isNewEmail });
       
       if (!isNewEmail) {
         // ⚠️ Email già registrata - non inviare a Formspree
@@ -301,11 +313,20 @@ function App() {
     alert(`📧 Email registrate: ${emails.length}\n\n${emails.map(item => `${item.email} (${new Date(item.timestamp).toLocaleString()})`).join('\n')}`);
   };
 
+  // 🗑️ Funzione per resettare localStorage (debug)
+  const clearEmailList = () => {
+    localStorage.removeItem('gigask-emails');
+    console.log('🗑️ LocalStorage emails cleared!');
+    alert('🗑️ Email list resettata! Ora puoi testare nuove email.');
+  };
+
   // Aggiunge funzione globale per debug e tracking
   React.useEffect(() => {
     window.showGigAskEmails = showRegisteredEmails;
+    window.clearGigAskEmails = clearEmailList; // 🗑️ Funzione per resettare
     console.log('🎯 GigAsk Landing Page caricata!');
     console.log('💡 Digita "showGigAskEmails()" nella console per vedere le email registrate');
+    console.log('🗑️ Digita "clearGigAskEmails()" per resettare la lista email');
     
     // 📊 Track caricamento pagina
     track('Page Load', {

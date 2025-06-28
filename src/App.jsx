@@ -111,6 +111,7 @@ function App() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isSubmitted, setIsSubmitted] = React.useState(false);
   const [submitMessage, setSubmitMessage] = React.useState('');
+  const [consentGiven, setConsentGiven] = React.useState(false); // 👈 Nuovo state per il consenso
 
   // Funzione per smooth scroll con tracking
   const scrollToSection = (sectionId) => {
@@ -164,36 +165,76 @@ function App() {
       return;
     }
 
+    // Validazione consenso
+    if (!consentGiven) {
+      setSubmitMessage('❌ Devi accettare di ricevere comunicazioni da GigAsk');
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitMessage('');
 
     try {
-      // Simulazione invio (sostituire con vero backend)
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Salva in localStorage come backup
+      // 🔍 Controlla duplicati PRIMA di inviare a Formspree
       const existingEmails = JSON.parse(localStorage.getItem('gigask-emails') || '[]');
       const isNewEmail = !existingEmails.some(item => item.email === email);
       
-      if (isNewEmail) {
-        existingEmails.push({
-          email: email,
-          timestamp: new Date().toISOString(),
-          source: 'waiting-list'
-        });
-        localStorage.setItem('gigask-emails', JSON.stringify(existingEmails));
-        
-        // 📊 Track dell'evento con Vercel Analytics
-        track('Waiting List Signup', {
-          email_domain: email.split('@')[1],
-          total_signups: existingEmails.length,
-          timestamp: new Date().toISOString()
-        });
+      if (!isNewEmail) {
+        // ⚠️ Email già registrata - non inviare a Formspree
+        setSubmitMessage('📧 Questa email è già nella waiting list!');
+        setIsSubmitting(false);
+        setTimeout(() => setSubmitMessage(''), 3000);
+        return;
       }
+
+      // 📧 Invia a Formspree SOLO se email nuova
+      const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mwpbaalo';
       
+      const response = await fetch(FORMSPREE_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          consent_gdpr: consentGiven,
+          source: 'gigask-landing',
+          page: 'waiting-list',
+          timestamp: new Date().toISOString(),
+          user_agent: navigator.userAgent,
+          message: `🎯 Nuova iscrizione GigAsk waiting list: ${email}`
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ Formspree response:', result);
+      
+      // 💾 Salva in localStorage (già verificato che è nuovo)
+      existingEmails.push({
+        email: email,
+        timestamp: new Date().toISOString(),
+        source: 'formspree-waiting-list',
+        consent_gdpr: consentGiven
+      });
+      localStorage.setItem('gigask-emails', JSON.stringify(existingEmails));
+
+      // ✅ Successo
       setIsSubmitted(true);
       setSubmitMessage('🎉 Perfetto! Sei nella waiting list');
       setEmail('');
+      setConsentGiven(false);
+      
+      // 📊 Track dell'evento con Vercel Analytics
+      track('Waiting List Signup', {
+        email_domain: email.split('@')[1],
+        total_signups: existingEmails.length,
+        timestamp: new Date().toISOString(),
+        source: 'formspree'
+      });
       
       // Reset dopo 5 secondi
       setTimeout(() => {
@@ -202,7 +243,19 @@ function App() {
       }, 5000);
       
     } catch (error) {
-      setSubmitMessage('❌ Errore. Riprova tra poco');
+      console.error('❌ Errore Formspree:', error);
+      setSubmitMessage('❌ Errore nel salvataggio. Riprova tra poco');
+      
+      // Fallback: salva solo in localStorage se Formspree fallisce
+      const existingEmails = JSON.parse(localStorage.getItem('gigask-emails') || '[]');
+      existingEmails.push({
+        email: email,
+        timestamp: new Date().toISOString(),
+        source: 'localStorage-fallback',
+        consent_gdpr: consentGiven,
+        error: 'formspree-failed'
+      });
+      localStorage.setItem('gigask-emails', JSON.stringify(existingEmails));
     } finally {
       setIsSubmitting(false);
     }
@@ -446,7 +499,7 @@ function App() {
                 gap: '1rem',
                 flexWrap: 'wrap',
                 justifyContent: 'center',
-                marginBottom: '2rem'
+                marginBottom: '1.5rem' // 👈 Ridotto per fare spazio alla checkbox
               }}>
                 <input
                   type="email"
@@ -468,7 +521,7 @@ function App() {
                 />
                 <button 
                   type="submit"
-                  disabled={isSubmitting || isSubmitted}
+                  disabled={isSubmitting || isSubmitted || !consentGiven} // 👈 Disabilitato se no consenso
                   style={{
                     backgroundColor: isSubmitted ? '#4caf50' : 'white', 
                     background: isSubmitted ? 
@@ -480,17 +533,57 @@ function App() {
                     fontSize: '1.2rem', 
                     fontWeight: '700', 
                     border: 'none', 
-                    cursor: (isSubmitting || isSubmitted) ? 'not-allowed' : 'pointer', 
+                    cursor: (isSubmitting || isSubmitted || !consentGiven) ? 'not-allowed' : 'pointer', 
                     boxShadow: '0 15px 40px rgba(255,255,255,0.4)',
                     transition: 'all 0.3s ease',
                     whiteSpace: 'nowrap',
-                    opacity: isSubmitted ? 0.9 : 1
+                    opacity: isSubmitted ? 0.9 : (!consentGiven ? 0.6 : 1) // 👈 Opacità ridotta se no consenso
                   }}
                 >
                   {isSubmitting ? '⏳ Invio...' : 
                    isSubmitted ? '✅ Registrato!' : 
                    '🎯 Unisciti ora'}
-        </button>
+                </button>
+              </div>
+              
+              {/* 👈 Checkbox per il consenso */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '0.8rem',
+                marginBottom: '2rem',
+                textAlign: 'left',
+                background: 'rgba(255, 255, 255, 0.1)',
+                padding: '1.2rem',
+                borderRadius: '1rem',
+                border: '1px solid rgba(255, 255, 255, 0.2)'
+              }}>
+                <input
+                  type="checkbox"
+                  id="consent-checkbox-hero"
+                  checked={consentGiven}
+                  onChange={(e) => setConsentGiven(e.target.checked)}
+                  disabled={isSubmitting || isSubmitted}
+                  style={{
+                    width: '1.2rem',
+                    height: '1.2rem',
+                    marginTop: '0.1rem',
+                    cursor: 'pointer',
+                    accentColor: '#ff6b35'
+                  }}
+                />
+                <label 
+                  htmlFor="consent-checkbox-hero" 
+                  style={{
+                    fontSize: '0.95rem',
+                    lineHeight: '1.4',
+                    cursor: 'pointer',
+                    color: 'rgba(255, 255, 255, 0.95)'
+                  }}
+                >
+                  Acconsento a ricevere comunicazioni informative e promozionali da <strong>GigAsk</strong>, ai sensi del Regolamento UE 2016/679 (GDPR). 
+                  Potrai annullare l'iscrizione in qualsiasi momento.
+                </label>
               </div>
               
               {/* Messaggio di feedback */}
@@ -1176,7 +1269,7 @@ function App() {
                 gap: '1rem',
                 flexWrap: 'wrap',
                 justifyContent: 'center',
-                marginBottom: '2rem'
+                marginBottom: '1.5rem' // 👈 Ridotto per fare spazio alla checkbox
               }}>
                 <input
                   type="email"
@@ -1198,7 +1291,7 @@ function App() {
                 />
                 <button 
                   type="submit"
-                  disabled={isSubmitting || isSubmitted}
+                  disabled={isSubmitting || isSubmitted || !consentGiven} // 👈 Disabilitato se no consenso
                   style={{
                     backgroundColor: isSubmitted ? '#4caf50' : 'white', 
                     background: isSubmitted ? 
@@ -1210,17 +1303,57 @@ function App() {
                     fontSize: '1.2rem', 
                     fontWeight: '700', 
                     border: 'none', 
-                    cursor: (isSubmitting || isSubmitted) ? 'not-allowed' : 'pointer', 
+                    cursor: (isSubmitting || isSubmitted || !consentGiven) ? 'not-allowed' : 'pointer', 
                     boxShadow: '0 15px 40px rgba(255,255,255,0.4)',
                     transition: 'all 0.3s ease',
                     whiteSpace: 'nowrap',
-                    opacity: isSubmitted ? 0.9 : 1
+                    opacity: isSubmitted ? 0.9 : (!consentGiven ? 0.6 : 1) // 👈 Opacità ridotta se no consenso
                   }}
                 >
                   {isSubmitting ? '⏳ Invio...' : 
                    isSubmitted ? '✅ Registrato!' : 
                    '🎯 Unisciti ora'}
                 </button>
+              </div>
+              
+              {/* 👈 Checkbox per il consenso */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '0.8rem',
+                marginBottom: '2rem',
+                textAlign: 'left',
+                background: 'rgba(255, 255, 255, 0.1)',
+                padding: '1.2rem',
+                borderRadius: '1rem',
+                border: '1px solid rgba(255, 255, 255, 0.2)'
+              }}>
+                <input
+                  type="checkbox"
+                  id="consent-checkbox-waiting"
+                  checked={consentGiven}
+                  onChange={(e) => setConsentGiven(e.target.checked)}
+                  disabled={isSubmitting || isSubmitted}
+                  style={{
+                    width: '1.2rem',
+                    height: '1.2rem',
+                    marginTop: '0.1rem',
+                    cursor: 'pointer',
+                    accentColor: '#ff6b35'
+                  }}
+                />
+                <label 
+                  htmlFor="consent-checkbox-waiting" 
+                  style={{
+                    fontSize: '0.95rem',
+                    lineHeight: '1.4',
+                    cursor: 'pointer',
+                    color: 'rgba(255, 255, 255, 0.95)'
+                  }}
+                >
+                  Acconsento a ricevere comunicazioni informative e promozionali da <strong>GigAsk</strong>, ai sensi del Regolamento UE 2016/679 (GDPR). 
+                  Potrai annullare l'iscrizione in qualsiasi momento.
+                </label>
               </div>
               
               {/* Messaggio di feedback */}
@@ -1915,7 +2048,7 @@ function App() {
           
           /* Hero section - complete mobile redesign */
           section:first-of-type {
-            padding: 2rem 1rem !important;
+            padding: 2rem 0.5rem !important;
             min-height: auto !important;
           }
           
@@ -1943,22 +2076,29 @@ function App() {
             max-width: 100% !important;
           }
           
-          /* Form mobile - complete rebuild */
+          /* Form mobile - complete rebuild with better centering */
           form {
             padding: 1.5rem 1rem !important;
-            margin: 0 1rem !important;
-            max-width: calc(100% - 2rem) !important;
+            margin: 0 auto !important;
+            max-width: calc(100% - 1rem) !important;
             width: auto !important;
             border-radius: 1rem !important;
             box-sizing: border-box !important;
             display: block !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            position: relative !important;
           }
           
-          /* Form centering fix */
-          section:first-of-type form {
+          /* Form centering fix - enhanced */
+          section:first-of-type form,
+          section:last-of-type form {
             margin-left: auto !important;
             margin-right: auto !important;
             text-align: center !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            position: relative !important;
           }
           
           /* Form inputs container */
@@ -2018,7 +2158,17 @@ function App() {
           
           /* All sections mobile */
           section {
-            padding: 2rem 1rem !important;
+            padding: 2rem 0.5rem !important;
+          }
+          
+          /* Waiting List section - special centering */
+          section:nth-last-child(2) {
+            padding: 2rem 0.5rem !important;
+          }
+          
+          section:nth-last-child(2) > div {
+            max-width: 100% !important;
+            padding: 0 0.5rem !important;
           }
           
           /* Section titles mobile */
@@ -2119,6 +2269,31 @@ function App() {
           .float-decoration {
             display: none !important;
           }
+          
+          /* Mobile responsive per checkbox */
+          @media screen and (max-width: 768px) {
+            /* ... existing mobile styles ... */
+            
+            /* Checkbox mobile */
+            form > div:nth-child(2) {
+              flex-direction: row !important;
+              align-items: flex-start !important;
+              text-align: left !important;
+              padding: 1rem !important;
+              gap: 0.6rem !important;
+            }
+            
+            form > div:nth-child(2) input[type="checkbox"] {
+              width: 1rem !important;
+              height: 1rem !important;
+              margin-top: 0.2rem !important;
+            }
+            
+            form > div:nth-child(2) label {
+              font-size: 0.85rem !important;
+              line-height: 1.3 !important;
+            }
+          }
         }
         
         /* Extra small screens */
@@ -2133,9 +2308,14 @@ function App() {
             padding: 0 0.5rem !important;
           }
           
+          /* Form centering for extra small screens */
           form {
-            margin: 0 0.5rem !important;
+            margin: 0 auto !important;
             padding: 1rem 0.8rem !important;
+            max-width: calc(100% - 0.5rem) !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            position: relative !important;
           }
           
           section h2 {
@@ -2145,6 +2325,13 @@ function App() {
           
           div[style*="padding: 2.5rem"] {
             padding: 1rem !important;
+          }
+          
+          /* Container centering for extra small screens */
+          section:first-of-type > div,
+          section:nth-last-child(2) > div {
+            padding: 0 0.25rem !important;
+            max-width: 100% !important;
           }
         }
 

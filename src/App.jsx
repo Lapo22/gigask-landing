@@ -175,31 +175,7 @@ function App() {
     setSubmitMessage('');
 
     try {
-      // 🔍 Controlla duplicati PRIMA di inviare a Formspree
-      const existingEmails = JSON.parse(localStorage.getItem('gigask-emails') || '[]');
-      console.log('🔍 Debug duplicati:', {
-        emailDaControllare: email,
-        emailsEsistenti: existingEmails,
-        numeroEmails: existingEmails.length
-      });
-      
-      const isNewEmail = !existingEmails.some(item => {
-        const isDuplicate = item.email === email;
-        console.log(`🔍 Confronto: "${item.email}" === "${email}" → ${isDuplicate}`);
-        return isDuplicate;
-      });
-      
-      console.log('🔍 Risultato check:', { isNewEmail, emailTrovata: !isNewEmail });
-      
-      if (!isNewEmail) {
-        // ⚠️ Email già registrata - non inviare a Formspree
-        setSubmitMessage('📧 Questa email è già nella waiting list!');
-        setIsSubmitting(false);
-        setTimeout(() => setSubmitMessage(''), 3000);
-        return;
-      }
-
-      // 📧 Invia a Formspree SOLO se email nuova
+      // 📧 Invia direttamente a Formspree (senza controllo duplicati)
       const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mwpbaalo';
       
       const response = await fetch(FORMSPREE_ENDPOINT, {
@@ -225,7 +201,8 @@ function App() {
       const result = await response.json();
       console.log('✅ Formspree response:', result);
       
-      // 💾 Salva in localStorage (già verificato che è nuovo)
+      // 💾 Salva in localStorage come backup (senza controllo duplicati)
+      const existingEmails = JSON.parse(localStorage.getItem('gigask-emails') || '[]');
       existingEmails.push({
         email: email,
         timestamp: new Date().toISOString(),

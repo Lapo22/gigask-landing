@@ -253,33 +253,45 @@ function App() {
   const faqData = [
     {
       question: "Come funziona GigAsk?",
-      answer: "GigAsk ti permette di chiedere o offrire aiuto per attività quotidiane. Chi ha bisogno pubblica un task, chi vuole guadagnare si propone. Quando il task è completato, il pagamento avviene in modo sicuro tramite app.",
+      answer: "GigAsk ti permette di chiedere o offrire aiuto per attività quotidiane. Chi ha bisogno pubblica un Gig, chi vuole guadagnare si propone. Una volta completato il lavoro, il pagamento avviene in modo sicuro direttamente tramite app.",
       emoji: "❓",
       color: "#ff6b35"
     },
     {
-      question: "Che tipo di task posso trovare o pubblicare?",
-      answer: "Puoi pubblicare o accettare attività come: spesa, pulizie, giardinaggio, babysitting o dogsitting, piccoli trasporti o lavoretti domestici, assistenza anziani, aiuto studio e molto altro.",
-      emoji: "📋",
+      question: "Che tipo di Gig posso trovare o pubblicare?",
+      answer: "Su GigAsk trovi attività come: fare la spesa, pulizie, giardinaggio, babysitting, dogsitting, piccoli trasporti, lavoretti domestici, assistenza anziani, supporto allo studio e molto altro.",
+      emoji: "🛠️",
       color: "#1e88e5"
     },
     {
       question: "Come avviene il pagamento?",
-      answer: "Il pagamento è gestito direttamente in app e viene sbloccato solo a task completato. Usiamo un sistema sicuro integrato con Stripe, per garantire tracciabilità e protezione.",
+      answer: "Tutti i pagamenti sono gestiti in modo sicuro tramite app. Il compenso viene sbloccato solo a Gig completato, grazie all'integrazione con Stripe, garantendo tracciabilità e protezione.",
       emoji: "💳",
       color: "#4caf50"
     },
     {
       question: "Serve la Partita IVA per guadagnare con GigAsk?",
-      answer: "No, per attività occasionali e non continuative non è obbligatoria. Se svolgi task in modo regolare o superi certi limiti di reddito, potresti doverla aprire. GigAsk non fornisce consulenza fiscale, ma nella sezione \"Aspetti fiscali\" dell'app trovi una guida chiara su cosa prevede la legge.",
+      answer: "No, per lavori occasionali e saltuari non è necessaria. Se invece svolgi attività continuative o superi certi limiti di reddito, potresti doverla aprire. Troverai una guida completa nella sezione \"Aspetti fiscali\" dell'app.",
       emoji: "📄",
       color: "#e91e63"
     },
     {
       question: "I guadagni ottenuti con GigAsk sono tassabili?",
-      answer: "Sì. Tutti i guadagni devono essere dichiarati secondo la normativa fiscale italiana. Puoi farlo, ad esempio, tramite prestazione occasionale o Partita IVA, in base alla tua situazione. Spieghiamo tutto nella sezione informativa dell'app, ma resta tua responsabilità gestire correttamente gli obblighi fiscali.",
+      answer: "Sì. Tutti i compensi vanno dichiarati secondo la normativa fiscale italiana, ad esempio come prestazione occasionale o con Partita IVA. Nell'app troverai una sezione informativa dedicata, ma resta tua responsabilità adempiere agli obblighi fiscali.",
       emoji: "💰",
       color: "#9c27b0"
+    },
+    {
+      question: "È sicuro usare GigAsk?",
+      answer: "Assolutamente sì. Tutti i profili sono verificati e i pagamenti avvengono in modo tracciabile e protetto. Inoltre, puoi lasciare recensioni e visualizzare la reputazione degli altri utenti.",
+      emoji: "🔒",
+      color: "#2e7d32"
+    },
+    {
+      question: "Posso ricevere una ricevuta per il pagamento?",
+      answer: "Sì, al termine di ogni Gig completato e pagato, riceverai una ricevuta digitale disponibile nell'app, utile anche per la tua gestione fiscale personale.",
+      emoji: "🧾",
+      color: "#f57c00"
     }
   ];
 
@@ -1197,7 +1209,7 @@ function App() {
 
                 {/* Answer - Expandable */}
                 <div style={{
-                  maxHeight: openFAQ === index ? '200px' : '0',
+                  maxHeight: openFAQ === index ? '400px' : '0',
                   overflow: 'hidden',
                   transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                   opacity: openFAQ === index ? 1 : 0

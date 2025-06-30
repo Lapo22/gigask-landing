@@ -142,6 +142,23 @@ function App() {
         timestamp: new Date().toISOString()
       });
     }
+    
+    // Smooth scroll adjustment per evitare jump del contenuto
+    setTimeout(() => {
+      if (!wasOpen) {
+        const element = document.querySelector(`[data-faq-index="${index}"]`);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          if (rect.top < 100) {
+            element.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'start',
+              inline: 'nearest'
+            });
+          }
+        }
+      }
+    }, 100);
   };
 
   // Funzione per validare l'email
@@ -171,11 +188,20 @@ function App() {
       return;
     }
 
+    // 🔄 Controllo duplicati email
+    const existingEmails = JSON.parse(localStorage.getItem('gigask-emails') || '[]');
+    const emailExists = existingEmails.some(item => item.email.toLowerCase() === email.toLowerCase());
+    
+    if (emailExists) {
+      setSubmitMessage('⚠️ Questa email è già registrata nella waiting list!');
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitMessage('');
 
     try {
-      // 📧 Invia direttamente a Formspree (senza controllo duplicati)
+      // 📧 Invia a Formspree (con controllo duplicati)
       const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mwpbaalo';
       
       const response = await fetch(FORMSPREE_ENDPOINT, {
@@ -201,7 +227,7 @@ function App() {
       const result = await response.json();
       console.log('✅ Formspree response:', result);
       
-      // 💾 Salva in localStorage come backup (senza controllo duplicati)
+      // 💾 Salva in localStorage come backup (controllo duplicati già effettuato)
       const existingEmails = JSON.parse(localStorage.getItem('gigask-emails') || '[]');
       existingEmails.push({
         email: email,
@@ -265,7 +291,7 @@ function App() {
     },
     {
       question: "Come avviene il pagamento?",
-      answer: "Tutti i pagamenti sono gestiti in modo sicuro tramite app. Il compenso viene sbloccato solo a Gig completato, grazie all'integrazione con Stripe, garantendo tracciabilità e protezione.",
+      answer: "Tutti i pagamenti sono gestiti in modo sicuro tramite app. Potrai pagare e ricevere compensi tramite PayPal o Stripe. Il denaro viene sbloccato solo a Gig completato, garantendo massima tracciabilità e protezione per entrambe le parti.",
       emoji: "💳",
       color: "#4caf50"
     },
@@ -406,27 +432,8 @@ function App() {
         position: 'relative',
         overflow: 'hidden'
       }} className="parallax-bg animated-gradient">
-        {/* Elementi decorativi fluttuanti */}
-        <div style={{
-          position: 'absolute',
-          top: '10%',
-          right: '10%',
-          width: '100px',
-          height: '100px',
-          borderRadius: '50%',
-          background: 'linear-gradient(135deg, #ff6b35, #f7931e)',
-          opacity: '0.3'
-        }} className="float-decoration"></div>
-        <div style={{
-          position: 'absolute',
-          bottom: '20%',
-          left: '5%',
-          width: '80px',
-          height: '80px',
-          borderRadius: '50%',
-          background: 'linear-gradient(135deg, #1e88e5, #00bcd4)',
-          opacity: '0.3'
-        }} className="float-decoration"></div>
+        
+
 
         <div style={containerStyle}>
           <div style={{textAlign: 'center', position: 'relative', zIndex: 2}} className="animate-section">
@@ -511,24 +518,38 @@ function App() {
                 justifyContent: 'center',
                 marginBottom: '1.5rem' // 👈 Ridotto per fare spazio alla checkbox
               }}>
-                <input
-                  type="email"
-                  placeholder="Inserisci la tua email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={isSubmitting || isSubmitted}
-                  style={{
-                    flex: '1',
-                    minWidth: '300px',
-                    padding: '1.5rem 2rem',
-                    borderRadius: '2rem',
-                    border: 'none',
-                    fontSize: '1.2rem',
-                    outline: 'none',
-                    opacity: isSubmitted ? 0.7 : 1,
-                    background: isSubmitted ? '#e8f5e8' : 'white'
-                  }}
-                />
+                <div style={{
+                  position: 'relative',
+                  flex: '1',
+                  minWidth: '300px',
+                  padding: '3px',
+                  borderRadius: '2rem',
+                  background: isSubmitted ? 
+                    'linear-gradient(135deg, #4caf50, #66bb6a)' : 
+                    'linear-gradient(135deg, #ff6b35, #f7931e, #e91e63)',
+                  transition: 'all 0.3s ease'
+                }}>
+                  <input
+                    type="email"
+                    placeholder="📧 Inserisci la tua email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={isSubmitting || isSubmitted}
+                    style={{
+                      width: '100%',
+                      padding: '1.5rem 2rem',
+                      borderRadius: '2rem',
+                      border: 'none',
+                      fontSize: '1.2rem',
+                      outline: 'none',
+                      opacity: 1,
+                      background: isSubmitted ? '#e8f5e8' : 'white',
+                      fontWeight: '500',
+                      color: '#2c3e50',
+                      boxSizing: 'border-box'
+                    }}
+                  />
+                </div>
                 <button 
                   type="submit"
                   disabled={isSubmitting || isSubmitted || !consentGiven} // 👈 Disabilitato se no consenso
@@ -602,11 +623,13 @@ function App() {
                   fontSize: '1rem',
                   marginBottom: '2rem',
                   textAlign: 'center',
-                  color: submitMessage.includes('❌') ? '#ff6b6b' : '#4caf50',
-                  fontWeight: '600',
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  padding: '1rem',
-                  borderRadius: '1rem'
+                  color: submitMessage.includes('❌') ? '#ff6b6b' : '#1a365d',
+                  fontWeight: '700',
+                  background: submitMessage.includes('❌') ? 'rgba(255, 107, 107, 0.1)' : 'rgba(26, 54, 93, 0.1)',
+                  padding: '1.2rem',
+                  borderRadius: '1rem',
+                  border: `2px solid ${submitMessage.includes('❌') ? 'rgba(255, 107, 107, 0.3)' : 'rgba(26, 54, 93, 0.3)'}`,
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
                 }}>
                   {submitMessage}
                 </div>
@@ -657,16 +680,32 @@ function App() {
                 <div style={{opacity: '0.9', fontSize: '0.9rem'}}>Lancio previsto</div>
               </div>
               <div style={{textAlign: 'center'}}>
-                <div style={{fontSize: '2.2rem', fontWeight: '800', marginBottom: '0.3rem', '--delay': '1s'}} className="stat-number">100%</div>
-                <div style={{opacity: '0.9', fontSize: '0.9rem'}}>Gratuito</div>
+                <div style={{fontSize: '2.2rem', fontWeight: '800', marginBottom: '0.3rem', '--delay': '1s'}} className="stat-number">🚀</div>
+                <div style={{opacity: '0.9', fontSize: '0.9rem'}}>Innovativo</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Transizione Hero → Come Funziona */}
+      <div style={{
+        height: '60px',
+        background: 'linear-gradient(180deg, rgba(233,30,99,0.3) 0%, rgba(102,126,234,0.15) 50%, rgba(255,255,255,0.8) 100%)',
+        position: 'relative',
+        zIndex: 1
+      }}></div>
+
       {/* Come Funziona Section */}
-      <section id="come-funziona" style={{...sectionStyle, backgroundColor: 'white', position: 'relative'}} className="animate-section">
+      <section id="come-funziona" style={{
+        ...sectionStyle, 
+        background: 'linear-gradient(135deg, rgba(255,107,53,0.06) 0%, rgba(247,147,30,0.08) 20%, rgba(255,255,255,0.95) 40%, rgba(30,136,229,0.06) 70%, rgba(156,39,176,0.08) 100%)', 
+        position: 'relative',
+        overflow: 'hidden'
+      }} className="animate-section">
+        
+
+
         <div style={containerStyle}>
           <h2 style={{
             fontSize: '3rem', 
@@ -732,9 +771,18 @@ function App() {
                   margin: '0 auto 1.2rem',
                   boxShadow: '0 15px 35px rgba(255, 107, 53, 0.3)',
                   transform: 'translateY(0)',
-                  transition: 'all 0.3s ease'
+                  transition: 'all 0.3s ease',
+                  position: 'relative'
                 }} className="step-icon-animation">
-                  <HandRaisedIcon style={{width: '1.8rem', height: '1.8rem', color: 'white'}} />
+                  <HandRaisedIcon style={{
+                    width: '1.8rem', 
+                    height: '1.8rem', 
+                    color: 'white',
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)'
+                  }} />
       </div>
                 <h4 style={{fontSize: '1.3rem', fontWeight: '700', marginBottom: '0.8rem', color: '#1a1a1a'}}>
                   1. Pubblica il tuo Gig
@@ -757,9 +805,18 @@ function App() {
                   margin: '0 auto 1.2rem',
                   boxShadow: '0 15px 35px rgba(255, 107, 53, 0.3)',
                   transform: 'translateY(0)',
-                  transition: 'all 0.3s ease'
+                  transition: 'all 0.3s ease',
+                  position: 'relative'
                 }} className="step-icon-animation">
-                  <UserGroupIcon style={{width: '1.8rem', height: '1.8rem', color: 'white'}} />
+                  <UserGroupIcon style={{
+                    width: '1.8rem', 
+                    height: '1.8rem', 
+                    color: 'white',
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)'
+                  }} />
                 </div>
                 <h4 style={{fontSize: '1.3rem', fontWeight: '700', marginBottom: '0.8rem', color: '#1a1a1a'}}>
                   2. Ricevi proposte
@@ -782,9 +839,18 @@ function App() {
                   margin: '0 auto 1.2rem',
                   boxShadow: '0 15px 35px rgba(255, 107, 53, 0.3)',
                   transform: 'translateY(0)',
-                  transition: 'all 0.3s ease'
+                  transition: 'all 0.3s ease',
+                  position: 'relative'
                 }} className="step-icon-animation">
-                  <CheckCircleIcon style={{width: '1.8rem', height: '1.8rem', color: 'white'}} />
+                  <CheckCircleIcon style={{
+                    width: '1.8rem', 
+                    height: '1.8rem', 
+                    color: 'white',
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)'
+                  }} />
                 </div>
                 <h4 style={{fontSize: '1.3rem', fontWeight: '700', marginBottom: '0.8rem', color: '#1a1a1a'}}>
                   3. Scegli e paga
@@ -829,9 +895,15 @@ function App() {
                   margin: '0 auto 1.2rem',
                   boxShadow: '0 15px 35px rgba(30, 136, 229, 0.3)',
                   transform: 'translateY(0)',
-                  transition: 'all 0.3s ease'
+                  transition: 'all 0.3s ease',
+                  position: 'relative'
                 }} className="step-icon-animation">
-                  <div className="icon-rotate">
+                  <div className="icon-rotate" style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)'
+                  }}>
                     <MagnifyingGlassIcon style={{width: '1.8rem', height: '1.8rem', color: 'white'}} />
                   </div>
                 </div>
@@ -856,15 +928,24 @@ function App() {
                   margin: '0 auto 1.2rem',
                   boxShadow: '0 15px 35px rgba(30, 136, 229, 0.3)',
                   transform: 'translateY(0)',
-                  transition: 'all 0.3s ease'
+                  transition: 'all 0.3s ease',
+                  position: 'relative'
                 }} className="step-icon-animation">
-                  <EnvelopeIcon style={{width: '1.8rem', height: '1.8rem', color: 'white'}} />
+                  <EnvelopeIcon style={{
+                    width: '1.8rem', 
+                    height: '1.8rem', 
+                    color: 'white',
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)'
+                  }} />
                 </div>
                 <h4 style={{fontSize: '1.3rem', fontWeight: '700', marginBottom: '0.8rem', color: '#1a1a1a'}}>
                   2. Invia la tua proposta
                 </h4>
                 <p style={{color: '#666', lineHeight: '1.6', fontSize: '0.95rem'}}>
-                  Proponiti. Mostra le tue competenze e recensioni.
+                  Candidati e aspetta che l'Asker scelga il Gigger adatto.
                 </p>
               </div>
 
@@ -881,9 +962,18 @@ function App() {
                   margin: '0 auto 1.2rem',
                   boxShadow: '0 15px 35px rgba(30, 136, 229, 0.3)',
                   transform: 'translateY(0)',
-                  transition: 'all 0.3s ease'
+                  transition: 'all 0.3s ease',
+                  position: 'relative'
                 }} className="step-icon-animation">
-                  <BanknotesIcon style={{width: '1.8rem', height: '1.8rem', color: 'white'}} />
+                  <BanknotesIcon style={{
+                    width: '1.8rem', 
+                    height: '1.8rem', 
+                    color: 'white',
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)'
+                  }} />
                 </div>
                 <h4 style={{fontSize: '1.3rem', fontWeight: '700', marginBottom: '0.8rem', color: '#1a1a1a'}}>
                   3. Lavora e guadagna
@@ -917,12 +1007,24 @@ function App() {
         </div>
       </section>
 
+      {/* Transizione Come Funziona → Vantaggi */}
+      <div style={{
+        height: '40px',
+        background: 'linear-gradient(180deg, rgba(227,242,253,0.6) 0%, rgba(232,245,232,0.4) 100%)',
+        position: 'relative',
+        zIndex: 1
+      }}></div>
+
       {/* Vantaggi Section */}
       <section id="vantaggi" style={{
         ...sectionStyle, 
-        background: 'linear-gradient(135deg, #f8fafc 0%, #e8f5e8 50%, #fff8e1 100%)',
-        position: 'relative'
+        background: 'linear-gradient(135deg, rgba(227,242,253,0.6) 0%, rgba(232,245,232,0.8) 30%, rgba(255,248,225,0.9) 60%, rgba(252,228,236,0.7) 100%)',
+        position: 'relative',
+        overflow: 'hidden'
       }} className="animate-section">
+        
+
+
         <div style={containerStyle}>
           <h2 style={{
             fontSize: '3rem', 
@@ -944,6 +1046,126 @@ function App() {
             Sarà la prima piattaforma italiana pensata specificamente per lavori occasionali
           </p>
           <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '3rem'}}>
+            {/* Per chi cerca aiuto */}
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)',
+              padding: '2.5rem',
+              borderRadius: '1.5rem',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+              border: '1px solid rgba(30,136,229,0.2)'
+            }} className="card-hover">
+              <h3 style={{
+                fontSize: '2rem', 
+                fontWeight: '700', 
+                marginBottom: '2rem', 
+                textAlign: 'center',
+                background: 'linear-gradient(135deg, #1e88e5 0%, #9c27b0 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}>
+                Per chi cerca aiuto
+              </h3>
+              <div style={{display: 'flex', flexDirection: 'column', gap: '1.8rem'}}>
+                <div style={{display: 'flex', alignItems: 'center', textAlign: 'center', flexDirection: 'column'}}>
+                  <div style={{
+                    background: 'linear-gradient(135deg, #1e88e5 0%, #3f51b5 100%)',
+                    borderRadius: '50%',
+                    padding: '0.8rem',
+                    marginBottom: '0.8rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    position: 'relative',
+                    width: '3.5rem',
+                    height: '3.5rem'
+                  }} className="benefit-icon-pulse">
+                    <UserGroupIcon style={{
+                      width: '1.8rem', 
+                      height: '1.8rem', 
+                      color: 'white',
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)'
+                    }} />
+                  </div>
+                  <div>
+                    <h4 style={{fontWeight: '700', marginBottom: '0.6rem', color: '#1a1a1a', fontSize: '1.2rem'}}>
+                      Gigger verificati
+                    </h4>
+                    <p style={{color: '#666', lineHeight: '1.6', fontSize: '1rem'}}>
+                      Tutti i profili saranno controllati e verificati
+                    </p>
+                  </div>
+                </div>
+                <div style={{display: 'flex', alignItems: 'center', textAlign: 'center', flexDirection: 'column'}}>
+                  <div style={{
+                    background: 'linear-gradient(135deg, #673ab7 0%, #9c27b0 100%)',
+                    borderRadius: '50%',
+                    padding: '0.8rem',
+                    marginBottom: '0.8rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    position: 'relative',
+                    width: '3.5rem',
+                    height: '3.5rem'
+                  }} className="benefit-icon-pulse">
+                    <ShieldCheckIcon style={{
+                      width: '1.8rem', 
+                      height: '1.8rem', 
+                      color: 'white',
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)'
+                    }} />
+                  </div>
+                  <div>
+                    <h4 style={{fontWeight: '700', marginBottom: '0.6rem', color: '#1a1a1a', fontSize: '1.2rem'}}>
+                      Pagamenti sicuri
+                    </h4>
+                    <p style={{color: '#666', lineHeight: '1.6', fontSize: '1rem'}}>
+                      Sistema di pagamento integrato e protetto
+                    </p>
+                  </div>
+                </div>
+                <div style={{display: 'flex', alignItems: 'center', textAlign: 'center', flexDirection: 'column'}}>
+                  <div style={{
+                    background: 'linear-gradient(135deg, #9c27b0 0%, #8e24aa 100%)',
+                    borderRadius: '50%',
+                    padding: '0.8rem',
+                    marginBottom: '0.8rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    position: 'relative',
+                    width: '3.5rem',
+                    height: '3.5rem'
+                  }} className="benefit-icon-pulse">
+                    <HeartIcon style={{
+                      width: '1.8rem', 
+                      height: '1.8rem', 
+                      color: 'white',
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)'
+                    }} />
+                  </div>
+                  <div>
+                    <h4 style={{fontWeight: '700', marginBottom: '0.6rem', color: '#1a1a1a', fontSize: '1.2rem'}}>
+                      Supporto 24/7
+                    </h4>
+                    <p style={{color: '#666', lineHeight: '1.6', fontSize: '1rem'}}>
+                      Assistenza sempre disponibile per ogni necessità
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Per chi cerca lavoro */}
             <div style={{
               background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)',
@@ -967,15 +1189,26 @@ function App() {
               <div style={{display: 'flex', flexDirection: 'column', gap: '1.8rem'}}>
                 <div style={{display: 'flex', alignItems: 'center', textAlign: 'center', flexDirection: 'column'}}>
                   <div style={{
-                    background: 'linear-gradient(135deg, #4caf50 0%, #8bc34a 100%)',
+                    background: 'linear-gradient(135deg, #ff6b35 0%, #ff7043 100%)',
                     borderRadius: '50%',
                     padding: '0.8rem',
                     marginBottom: '0.8rem',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
+                    position: 'relative',
+                    width: '3.5rem',
+                    height: '3.5rem'
                   }} className="benefit-icon-pulse">
-                    <RocketLaunchIcon style={{width: '1.8rem', height: '1.8rem', color: 'white'}} />
+                    <RocketLaunchIcon style={{
+                      width: '1.8rem', 
+                      height: '1.8rem', 
+                      color: 'white',
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)'
+                    }} />
                   </div>
                   <div>
                     <h4 style={{fontWeight: '700', marginBottom: '0.6rem', color: '#1a1a1a', fontSize: '1.2rem'}}>
@@ -988,15 +1221,26 @@ function App() {
                 </div>
                 <div style={{display: 'flex', alignItems: 'center', textAlign: 'center', flexDirection: 'column'}}>
                   <div style={{
-                    background: 'linear-gradient(135deg, #2196f3 0%, #03a9f4 100%)',
+                    background: 'linear-gradient(135deg, #f7931e 0%, #e91e63 100%)',
                     borderRadius: '50%',
                     padding: '0.8rem',
                     marginBottom: '0.8rem',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
+                    position: 'relative',
+                    width: '3.5rem',
+                    height: '3.5rem'
                   }} className="benefit-icon-pulse">
-                    <ClockIcon style={{width: '1.8rem', height: '1.8rem', color: 'white'}} />
+                    <ClockIcon style={{
+                      width: '1.8rem', 
+                      height: '1.8rem', 
+                      color: 'white',
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)'
+                    }} />
                   </div>
                   <div>
                     <h4 style={{fontWeight: '700', marginBottom: '0.6rem', color: '#1a1a1a', fontSize: '1.2rem'}}>
@@ -1009,15 +1253,26 @@ function App() {
                 </div>
                 <div style={{display: 'flex', alignItems: 'center', textAlign: 'center', flexDirection: 'column'}}>
                   <div style={{
-                    background: 'linear-gradient(135deg, #ff9800 0%, #ffc107 100%)',
+                    background: 'linear-gradient(135deg, #e91e63 0%, #c2185b 100%)',
                     borderRadius: '50%',
                     padding: '0.8rem',
                     marginBottom: '0.8rem',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
+                    position: 'relative',
+                    width: '3.5rem',
+                    height: '3.5rem'
                   }} className="benefit-icon-pulse">
-                    <SparklesIcon style={{width: '1.8rem', height: '1.8rem', color: 'white'}} />
+                    <SparklesIcon style={{
+                      width: '1.8rem', 
+                      height: '1.8rem', 
+                      color: 'white',
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)'
+                    }} />
                   </div>
                   <div>
                     <h4 style={{fontWeight: '700', marginBottom: '0.6rem', color: '#1a1a1a', fontSize: '1.2rem'}}>
@@ -1030,209 +1285,207 @@ function App() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
 
-            {/* Per chi offre lavoro */}
+      {/* Transizione Vantaggi → FAQ */}
+      <div style={{
+        height: '50px',
+        background: 'linear-gradient(180deg, rgba(252,228,236,0.5) 0%, rgba(248,250,252,0.7) 50%, rgba(227,242,253,0.8) 100%)',
+        position: 'relative',
+        zIndex: 1
+      }}></div>
+
+      {/* FAQ Section */}
+      <section id="faq" style={{
+        ...sectionStyle, 
+        background: 'linear-gradient(135deg, #f8fafc 0%, #e3f2fd 30%, #fff3e0 70%, #fce4ec 100%)',
+        position: 'relative',
+        overflow: 'hidden'
+      }} className="animate-section">
+        
+
+
+        <div style={containerStyle}>
+          <div style={{position: 'relative', zIndex: 2}}>
+            <h2 style={{
+              fontSize: '3rem', 
+              fontWeight: '800', 
+              textAlign: 'center', 
+              marginBottom: '1rem',
+              ...gradientText
+            }}>
+              Domande Frequenti
+            </h2>
+            <p style={{
+              fontSize: '1.3rem',
+              color: '#666',
+              textAlign: 'center',
+              marginBottom: '4rem',
+              maxWidth: '600px',
+              margin: '0 auto 4rem'
+            }}>
+              Tutto quello che devi sapere su GigAsk
+            </p>
+
             <div style={{
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)',
-              padding: '2.5rem',
-              borderRadius: '1.5rem',
-              boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
-              border: '1px solid rgba(30,136,229,0.2)'
-            }} className="card-hover">
-              <h3 style={{
-                fontSize: '2rem', 
-                fontWeight: '700', 
-                marginBottom: '2rem', 
-                textAlign: 'center',
-                background: 'linear-gradient(135deg, #1e88e5 0%, #9c27b0 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
-              }}>
-                Per chi cerca aiuto
-              </h3>
-              <div style={{display: 'flex', flexDirection: 'column', gap: '1.8rem'}}>
-                <div style={{display: 'flex', alignItems: 'center', textAlign: 'center', flexDirection: 'column'}}>
-                  <div style={{
-                    background: 'linear-gradient(135deg, #4caf50 0%, #8bc34a 100%)',
-                    borderRadius: '50%',
-                    padding: '0.8rem',
-                    marginBottom: '0.8rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }} className="benefit-icon-pulse">
-                    <UserGroupIcon style={{width: '1.8rem', height: '1.8rem', color: 'white'}} />
+              maxWidth: '900px',
+              margin: '0 auto',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1.5rem'
+            }}>
+              {faqData.map((item, index) => (
+                <div key={index} data-faq-index={index} style={{
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%)',
+                  borderRadius: '1.5rem',
+                  boxShadow: '0 15px 40px rgba(0,0,0,0.12)',
+                  border: `2px solid ${item.color}15`,
+                  overflow: 'hidden',
+                  transition: 'all 0.3s ease',
+                  backdropFilter: 'blur(10px)'
+                }} className="faq-card">
+                  {/* Question - Clickable */}
+                  <div 
+                    onClick={() => toggleFAQ(index)}
+                    style={{
+                      padding: '2rem',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '1rem',
+                      transition: 'all 0.3s ease',
+                      background: openFAQ === index ? `${item.color}08` : 'transparent',
+                      position: 'relative'
+                    }}
+                    className="faq-question"
+                  >
+                    {/* Emoji e Testo */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '1rem',
+                      flex: 1,
+                      minWidth: 0
+                    }}>
+                      <div style={{
+                        background: `linear-gradient(135deg, ${item.color}, ${item.color}dd)`,
+                        borderRadius: '50%',
+                        width: '3rem',
+                        height: '3rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '1.2rem',
+                        boxShadow: `0 8px 20px ${item.color}30`,
+                        flexShrink: 0,
+                        position: 'relative'
+                      }}>
+                        <span style={{
+                          position: 'absolute',
+                          top: '50%',
+                          left: '50%',
+                          transform: 'translate(-50%, -50%)',
+                          fontSize: '1.2rem',
+                          lineHeight: 1
+                        }}>
+                          {item.emoji}
+                        </span>
+                      </div>
+                      <h3 style={{
+                        fontSize: '1.3rem',
+                        fontWeight: '700',
+                        margin: 0,
+                        color: '#1a1a1a',
+                        lineHeight: '1.4'
+                      }}>
+                        {item.question}
+                      </h3>
+                    </div>
+                    
+                    {/* Freccia - Posizione fissa */}
+                    <div style={{
+                      width: '2.5rem',
+                      height: '2.5rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '50%',
+                      background: `linear-gradient(135deg, ${item.color}15, ${item.color}08)`,
+                      transition: 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                      transform: openFAQ === index ? 'rotate(180deg) scale(1.05)' : 'rotate(0deg) scale(1)',
+                      flexShrink: 0,
+                      boxShadow: openFAQ === index ? `0 4px 15px ${item.color}25` : '0 2px 8px rgba(0,0,0,0.1)',
+                      position: 'relative'
+                    }}>
+                      <ChevronDownIcon 
+                        style={{
+                          width: '1.2rem',
+                          height: '1.2rem',
+                          color: item.color,
+                          strokeWidth: 2.5,
+                          transition: 'all 0.4s ease',
+                          position: 'absolute',
+                          top: '50%',
+                          left: '50%',
+                          transform: 'translate(-50%, -50%)'
+                        }}
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <h4 style={{fontWeight: '700', marginBottom: '0.6rem', color: '#1a1a1a', fontSize: '1.2rem'}}>
-                      Gigger verificati
-                    </h4>
-                    <p style={{color: '#666', lineHeight: '1.6', fontSize: '1rem'}}>
-                      Tutti i profili saranno controllati e verificati
-                    </p>
+
+                  {/* Answer - Expandable */}
+                  <div style={{
+                    maxHeight: openFAQ === index ? '500px' : '0',
+                    overflow: 'hidden',
+                    transition: 'max-height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s',
+                    opacity: openFAQ === index ? 1 : 0
+                  }}>
+                    <div style={{
+                      padding: '0 2rem 2rem 2rem',
+                      borderTop: `1px solid ${item.color}20`,
+                      marginTop: '1rem',
+                      transform: openFAQ === index ? 'translateY(0)' : 'translateY(-10px)',
+                      transition: 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s'
+                    }}>
+                      <div style={{
+                        background: `linear-gradient(135deg, ${item.color}05, transparent)`,
+                        borderRadius: '1rem',
+                        padding: '1.5rem',
+                        marginTop: '1rem',
+                        border: `1px solid ${item.color}10`,
+                        transform: openFAQ === index ? 'scale(1)' : 'scale(0.98)',
+                        transition: 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s'
+                      }}>
+                        <p style={{
+                          color: '#555', 
+                          lineHeight: '1.7', 
+                          fontSize: '1.05rem',
+                          margin: 0,
+                          fontWeight: '400',
+                          opacity: openFAQ === index ? 1 : 0,
+                          transition: 'opacity 0.4s ease 0.4s'
+                        }}>
+                          {item.answer}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div style={{display: 'flex', alignItems: 'center', textAlign: 'center', flexDirection: 'column'}}>
-                  <div style={{
-                    background: 'linear-gradient(135deg, #2196f3 0%, #03a9f4 100%)',
-                    borderRadius: '50%',
-                    padding: '0.8rem',
-                    marginBottom: '0.8rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }} className="benefit-icon-pulse">
-                    <ShieldCheckIcon style={{width: '1.8rem', height: '1.8rem', color: 'white'}} />
-                  </div>
-                  <div>
-                    <h4 style={{fontWeight: '700', marginBottom: '0.6rem', color: '#1a1a1a', fontSize: '1.2rem'}}>
-                      Pagamenti sicuri
-                    </h4>
-                    <p style={{color: '#666', lineHeight: '1.6', fontSize: '1rem'}}>
-                      Sistema di pagamento integrato e protetto
-                    </p>
-                  </div>
-                </div>
-                <div style={{display: 'flex', alignItems: 'center', textAlign: 'center', flexDirection: 'column'}}>
-                  <div style={{
-                    background: 'linear-gradient(135deg, #ff9800 0%, #ffc107 100%)',
-                    borderRadius: '50%',
-                    padding: '0.8rem',
-                    marginBottom: '0.8rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }} className="benefit-icon-pulse">
-                    <HeartIcon style={{width: '1.8rem', height: '1.8rem', color: 'white'}} />
-                  </div>
-                  <div>
-                    <h4 style={{fontWeight: '700', marginBottom: '0.6rem', color: '#1a1a1a', fontSize: '1.2rem'}}>
-                      Supporto 24/7
-                    </h4>
-                    <p style={{color: '#666', lineHeight: '1.6', fontSize: '1rem'}}>
-                      Assistenza sempre disponibile per ogni necessità
-                    </p>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section id="faq" style={{
-        ...sectionStyle, 
-        backgroundColor: 'white',
-        position: 'relative'
-      }} className="animate-section">
-        <div style={containerStyle}>
-          <h2 style={{
-            fontSize: '3rem', 
-            fontWeight: '800', 
-            textAlign: 'center', 
-            marginBottom: '1rem',
-            ...gradientText
-          }}>
-            Domande Frequenti
-          </h2>
-          <p style={{
-            fontSize: '1.3rem',
-            color: '#666',
-            textAlign: 'center',
-            marginBottom: '4rem',
-            maxWidth: '600px',
-            margin: '0 auto 4rem'
-          }}>
-            Tutto quello che devi sapere su GigAsk
-          </p>
-
-          <div style={{
-            maxWidth: '800px',
-            margin: '0 auto',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1rem'
-          }}>
-            {faqData.map((item, index) => (
-              <div key={index} style={{
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)',
-                borderRadius: '1.2rem',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
-                border: `1px solid ${item.color}20`,
-                overflow: 'hidden',
-                transition: 'all 0.3s ease'
-              }}>
-                {/* Question - Clickable */}
-                <div 
-                  onClick={() => toggleFAQ(index)}
-                  style={{
-                    padding: '1.5rem 2rem',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    transition: 'all 0.3s ease',
-                    background: openFAQ === index ? `${item.color}10` : 'transparent'
-                  }}
-                  className="faq-question"
-                >
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.8rem'
-                  }}>
-                    <span style={{
-                      color: item.color,
-                      fontSize: '1.2rem'
-                    }}>{item.emoji}</span>
-                    <h3 style={{
-                      fontSize: '1.2rem',
-                      fontWeight: '600',
-                      margin: 0,
-                      color: '#1a1a1a'
-                    }}>
-                      {item.question}
-                    </h3>
-                  </div>
-                  <ChevronDownIcon 
-                    style={{
-                      width: '1.5rem',
-                      height: '1.5rem',
-                      color: item.color,
-                      transition: 'transform 0.3s ease',
-                      transform: openFAQ === index ? 'rotate(180deg)' : 'rotate(0deg)'
-                    }}
-                  />
-                </div>
-
-                {/* Answer - Expandable */}
-                <div style={{
-                  maxHeight: openFAQ === index ? '400px' : '0',
-                  overflow: 'hidden',
-                  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                  opacity: openFAQ === index ? 1 : 0
-                }}>
-                  <div style={{
-                    padding: '0 2rem 1.5rem 2rem',
-                    borderTop: `1px solid ${item.color}15`
-                  }}>
-                    <p style={{
-                      color: '#666', 
-                      lineHeight: '1.6', 
-                      fontSize: '1rem',
-                      margin: '1rem 0 0 0'
-                    }}>
-                      {item.answer}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Transizione FAQ → Waiting List */}
+      <div style={{
+        height: '70px',
+        background: 'linear-gradient(180deg, rgba(252,228,236,0.6) 0%, rgba(118,75,162,0.2) 50%, rgba(102,126,234,0.4) 100%)',
+        position: 'relative',
+        zIndex: 1
+      }}></div>
 
       {/* Waiting List CTA Section */}
       <section id="waiting-list" style={{
@@ -1261,7 +1514,7 @@ function App() {
               textShadow: '0 2px 10px rgba(0,0,0,0.2)'
             }}>
               Unisciti alla waiting list e ricevi accesso esclusivo in anteprima. 
-              <strong>Completamente gratuito!</strong>
+              <strong>Sii tra i primi a scoprire GigAsk!</strong>
             </p>
             
             {/* Large Waiting List Form */}
@@ -1281,24 +1534,38 @@ function App() {
                 justifyContent: 'center',
                 marginBottom: '1.5rem' // 👈 Ridotto per fare spazio alla checkbox
               }}>
-                <input
-                  type="email"
-                  placeholder="Inserisci la tua email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={isSubmitting || isSubmitted}
-                  style={{
-                    flex: '1',
-                    minWidth: '300px',
-                    padding: '1.5rem 2rem',
-                    borderRadius: '2rem',
-                    border: 'none',
-                    fontSize: '1.2rem',
-                    outline: 'none',
-                    opacity: isSubmitted ? 0.7 : 1,
-                    background: isSubmitted ? '#e8f5e8' : 'white'
-                  }}
-                />
+                <div style={{
+                  position: 'relative',
+                  flex: '1',
+                  minWidth: '300px',
+                  padding: '3px',
+                  borderRadius: '2rem',
+                  background: isSubmitted ? 
+                    'linear-gradient(135deg, #4caf50, #66bb6a)' : 
+                    'linear-gradient(135deg, #ff6b35, #f7931e, #e91e63)',
+                  transition: 'all 0.3s ease'
+                }}>
+                  <input
+                    type="email"
+                    placeholder="📧 Inserisci la tua email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={isSubmitting || isSubmitted}
+                    style={{
+                      width: '100%',
+                      padding: '1.5rem 2rem',
+                      borderRadius: '2rem',
+                      border: 'none',
+                      fontSize: '1.2rem',
+                      outline: 'none',
+                      opacity: 1,
+                      background: isSubmitted ? '#e8f5e8' : 'white',
+                      fontWeight: '500',
+                      color: '#2c3e50',
+                      boxSizing: 'border-box'
+                    }}
+                  />
+                </div>
                 <button 
                   type="submit"
                   disabled={isSubmitting || isSubmitted || !consentGiven} // 👈 Disabilitato se no consenso
@@ -1372,11 +1639,13 @@ function App() {
                   fontSize: '1rem',
                   marginBottom: '2rem',
                   textAlign: 'center',
-                  color: submitMessage.includes('❌') ? '#ff6b6b' : '#4caf50',
-                  fontWeight: '600',
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  padding: '1rem',
-                  borderRadius: '1rem'
+                  color: submitMessage.includes('❌') ? '#ff6b6b' : '#1a365d',
+                  fontWeight: '700',
+                  background: submitMessage.includes('❌') ? 'rgba(255, 107, 107, 0.1)' : 'rgba(26, 54, 93, 0.1)',
+                  padding: '1.2rem',
+                  borderRadius: '1rem',
+                  border: `2px solid ${submitMessage.includes('❌') ? 'rgba(255, 107, 107, 0.3)' : 'rgba(26, 54, 93, 0.3)'}`,
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
                 }}>
                   {submitMessage}
                 </div>
@@ -1426,9 +1695,77 @@ function App() {
                 <GigAskLogo size={60} showText={false} />
               </div>
             </div>
-            <p style={{color: '#b0bec5', marginBottom: '1.5rem', fontSize: '1.2rem'}}>
+            <p style={{color: '#b0bec5', marginBottom: '2.5rem', fontSize: '1.2rem'}}>
               La prima piattaforma italiana per lavori occasionali - In arrivo prossimamente
             </p>
+            
+            {/* Sezione Contatti */}
+            <div style={{
+              marginBottom: '2.5rem',
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '3rem',
+              flexWrap: 'wrap'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.8rem',
+                color: '#b0bec5'
+              }}>
+                <div style={{
+                  background: 'linear-gradient(135deg, #ff6b35, #e91e63)',
+                  borderRadius: '50%',
+                  padding: '0.6rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <EnvelopeIcon style={{width: '1.2rem', height: '1.2rem', color: 'white'}} />
+                </div>
+                <div>
+                  <p style={{margin: 0, fontSize: '0.9rem', opacity: 0.8}}>Contattaci</p>
+                  <a href="mailto:info@gigask.it" style={{
+                    color: '#b0bec5',
+                    textDecoration: 'none',
+                    fontSize: '1.1rem',
+                    fontWeight: '500'
+                  }}>
+                    info@gigask.it
+                  </a>
+                </div>
+              </div>
+              
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.8rem',
+                color: '#b0bec5'
+              }}>
+                <div style={{
+                  background: 'linear-gradient(135deg, #1e88e5, #9c27b0)',
+                  borderRadius: '50%',
+                  padding: '0.6rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <span style={{fontSize: '1.2rem', color: 'white'}}>📞</span>
+                </div>
+                <div>
+                  <p style={{margin: 0, fontSize: '0.9rem', opacity: 0.8}}>Supporto</p>
+                  <a href="tel:+393451234567" style={{
+                    color: '#b0bec5',
+                    textDecoration: 'none',
+                    fontSize: '1.1rem',
+                    fontWeight: '500'
+                  }}>
+                    +39 345 123 4567
+                  </a>
+                </div>
+              </div>
+            </div>
+            
             <p style={{color: '#78909c', fontSize: '1rem'}}>
               © 2024 GigAsk. Tutti i diritti riservati.
             </p>
@@ -1559,22 +1896,17 @@ function App() {
           animation: slideInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        /* Floating decorative elements */
-        .float-decoration {
-          animation: float 6s ease-in-out infinite;
+        /* Contact links hover effects */
+        footer a {
+          transition: all 0.3s ease;
         }
         
-        .float-decoration:nth-child(2n) {
-          animation-delay: -2s;
-          animation-duration: 8s;
+        footer a:hover {
+          color: #ffffff !important;
+          transform: translateY(-2px);
         }
         
-        .float-decoration:nth-child(3n) {
-          animation-delay: -4s;
-          animation-duration: 10s;
-        }
-        
-        /* Gradient text hover effect */
+                  /* Gradient text hover effect */
         .gradient-text-hover {
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           cursor: pointer;
@@ -2235,22 +2567,50 @@ function App() {
           }
           
           /* FAQ section mobile */
-          section:nth-child(6) > div > div > div {
-            margin-bottom: 0.8rem !important;
+          .faq-card {
+            margin-bottom: 1rem !important;
           }
           
           /* FAQ questions mobile */
-          div[style*="cursor: pointer"] {
-            padding: 1rem !important;
-            font-size: 0.95rem !important;
-            text-align: left !important;
+          .faq-question {
+            padding: 1.5rem 1rem !important;
+            gap: 0.8rem !important;
+          }
+          
+          .faq-question h3 {
+            font-size: 1.1rem !important;
+            line-height: 1.3 !important;
+          }
+          
+          /* FAQ emoji circles mobile */
+          .faq-question > div:first-child > div:first-child {
+            width: 2.5rem !important;
+            height: 2.5rem !important;
+            font-size: 1rem !important;
+          }
+          
+          /* FAQ arrow container mobile - mantieni dimensioni fisse */
+          .faq-question > div:last-child {
+            width: 2rem !important;
+            height: 2rem !important;
+            min-width: 2rem !important;
+            min-height: 2rem !important;
+            flex-shrink: 0 !important;
           }
           
           /* FAQ answers mobile */
-          div[style*="padding: 1.5rem"] {
+          .faq-question + div > div {
+            padding: 0 1rem 1.5rem 1rem !important;
+          }
+          
+          .faq-question + div > div > div {
             padding: 1rem !important;
-            font-size: 0.9rem !important;
-            line-height: 1.4 !important;
+            margin-top: 0.5rem !important;
+          }
+          
+          .faq-question + div > div > div > p {
+            font-size: 0.95rem !important;
+            line-height: 1.5 !important;
           }
           
           /* Footer mobile */
@@ -2265,14 +2625,11 @@ function App() {
             align-items: center !important;
           }
           
-          /* Hide decorative elements */
           div[style*="position: absolute"] {
             display: none !important;
           }
           
-          .float-decoration {
-            display: none !important;
-          }
+
           
           /* Mobile responsive per checkbox */
           @media screen and (max-width: 768px) {
@@ -2343,14 +2700,74 @@ function App() {
         }
 
         /* FAQ Accordion Styles */
+        .faq-card {
+          transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .faq-card:hover {
+          transform: translateY(-4px) scale(1.01);
+          box-shadow: 0 25px 60px rgba(0,0,0,0.18) !important;
+        }
+        
+        .faq-question {
+          transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
         .faq-question:hover {
-          background: rgba(255, 107, 53, 0.08) !important;
-          transform: translateY(-1px);
+          background: rgba(255, 107, 53, 0.06) !important;
         }
 
         .faq-question:active {
-          transform: translateY(0);
+          transform: scale(0.98);
         }
+        
+        /* Smooth accordion animation enhanced */
+        @keyframes accordionSlide {
+          from {
+            max-height: 0;
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            max-height: 500px;
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        /* Perfect icon centering - fallback per tutti i cerchi */
+        .step-icon-animation, .benefit-icon-pulse {
+          position: relative !important;
+        }
+        
+        .step-icon-animation svg, .benefit-icon-pulse svg {
+          position: absolute !important;
+          top: 50% !important;
+          left: 50% !important;
+          transform: translate(-50%, -50%) !important;
+        }
+        
+        /* Text centering per emoji */
+        .faq-card span {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          text-align: center !important;
+        }
+        
+        /* Navbar responsive - nascondi su mobile */
+        @media screen and (max-width: 768px) {
+          nav {
+            display: none !important;
+          }
+          
+          /* Rimuovi padding top dal body per compensare */
+          body {
+            padding-top: 0 !important;
+          }
+        }
+        
+
 
         /* Smooth accordion animation */
         @keyframes accordionSlide {

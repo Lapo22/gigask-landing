@@ -23,6 +23,9 @@ import { track } from '@vercel/analytics'
 import logoImage from './assets/icon.png'
 import gigaskText from './assets/Gigaskscritta.png'
 
+// Importa il nuovo componente Supabase 
+import WaitingListForm from './WaitingListForm'
+
 // Componente Logo che usa l'immagine reale con scritta
 const GigAskLogo = ({ size = 60, showText = true }) => (
   <div style={{ display: 'flex', alignItems: 'center', gap: showText ? '1rem' : '0' }}>
@@ -106,12 +109,7 @@ function App() {
   // State per gestire le FAQ aperte
   const [openFAQ, setOpenFAQ] = React.useState(null);
   
-  // State per gestire la registrazione email
-  const [email, setEmail] = React.useState('');
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [isSubmitted, setIsSubmitted] = React.useState(false);
-  const [submitMessage, setSubmitMessage] = React.useState('');
-  const [consentGiven, setConsentGiven] = React.useState(false); // 👈 Nuovo state per il consenso
+
 
   // Funzione per smooth scroll con tracking
   const scrollToSection = (sectionId) => {
@@ -158,123 +156,10 @@ function App() {
           }
         }
       }
-    }, 100);
+    }, 50);
   };
 
-  // Funzione per validare l'email
-  const isValidEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
 
-  // Funzione per gestire il submit del form
-  const handleEmailSubmit = async (e) => {
-    e.preventDefault();
-    
-    // Validazione email
-    if (!email) {
-      setSubmitMessage('❌ Inserisci la tua email');
-      return;
-    }
-    
-    if (!isValidEmail(email)) {
-      setSubmitMessage('❌ Inserisci un\'email valida');
-      return;
-    }
-
-    // Validazione consenso
-    if (!consentGiven) {
-      setSubmitMessage('❌ Devi accettare di ricevere comunicazioni da GigAsk');
-      return;
-    }
-
-    // 🔄 Controllo duplicati email
-    const existingEmails = JSON.parse(localStorage.getItem('gigask-emails') || '[]');
-    const emailExists = existingEmails.some(item => item.email.toLowerCase() === email.toLowerCase());
-    
-    if (emailExists) {
-      setSubmitMessage('⚠️ Questa email è già registrata nella waiting list!');
-      return;
-    }
-
-    setIsSubmitting(true);
-    setSubmitMessage('');
-
-    try {
-      // 📧 Invia a Formspree (con controllo duplicati)
-      const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mwpbaalo';
-      
-      const response = await fetch(FORMSPREE_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email,
-          consent_gdpr: consentGiven,
-          source: 'gigask-landing',
-          page: 'waiting-list',
-          timestamp: new Date().toISOString(),
-          user_agent: navigator.userAgent,
-          message: `🎯 Nuova iscrizione GigAsk waiting list: ${email}`
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-      console.log('✅ Formspree response:', result);
-      
-      // 💾 Salva in localStorage come backup (controllo duplicati già effettuato)
-      const existingEmails = JSON.parse(localStorage.getItem('gigask-emails') || '[]');
-      existingEmails.push({
-        email: email,
-        timestamp: new Date().toISOString(),
-        source: 'formspree-waiting-list',
-        consent_gdpr: consentGiven
-      });
-      localStorage.setItem('gigask-emails', JSON.stringify(existingEmails));
-
-      // ✅ Successo
-      setIsSubmitted(true);
-      setSubmitMessage('🎉 Perfetto! Sei nella waiting list');
-      setEmail('');
-      setConsentGiven(false);
-      
-      // 📊 Track dell'evento con Vercel Analytics
-      track('Waiting List Signup', {
-        email_domain: email.split('@')[1],
-        total_signups: existingEmails.length,
-        timestamp: new Date().toISOString(),
-        source: 'formspree'
-      });
-      
-      // Reset dopo 5 secondi
-      setTimeout(() => {
-        setIsSubmitted(false);
-        setSubmitMessage('');
-      }, 5000);
-      
-    } catch (error) {
-      console.error('❌ Errore Formspree:', error);
-      setSubmitMessage('❌ Errore nel salvataggio. Riprova tra poco');
-      
-      // Fallback: salva solo in localStorage se Formspree fallisce
-      const existingEmails = JSON.parse(localStorage.getItem('gigask-emails') || '[]');
-      existingEmails.push({
-        email: email,
-        timestamp: new Date().toISOString(),
-        source: 'localStorage-fallback',
-        consent_gdpr: consentGiven,
-        error: 'formspree-failed'
-      });
-      localStorage.setItem('gigask-emails', JSON.stringify(existingEmails));
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const faqData = [
     {
@@ -321,27 +206,11 @@ function App() {
     }
   ];
 
-  // Funzione per visualizzare le email registrate (debug)
-  const showRegisteredEmails = () => {
-    const emails = JSON.parse(localStorage.getItem('gigask-emails') || '[]');
-    console.log('📧 Email registrate:', emails);
-    alert(`📧 Email registrate: ${emails.length}\n\n${emails.map(item => `${item.email} (${new Date(item.timestamp).toLocaleString()})`).join('\n')}`);
-  };
 
-  // 🗑️ Funzione per resettare localStorage (debug)
-  const clearEmailList = () => {
-    localStorage.removeItem('gigask-emails');
-    console.log('🗑️ LocalStorage emails cleared!');
-    alert('🗑️ Email list resettata! Ora puoi testare nuove email.');
-  };
 
-  // Aggiunge funzione globale per debug e tracking
+  // Setup tracking e analytics
   React.useEffect(() => {
-    window.showGigAskEmails = showRegisteredEmails;
-    window.clearGigAskEmails = clearEmailList; // 🗑️ Funzione per resettare
     console.log('🎯 GigAsk Landing Page caricata!');
-    console.log('💡 Digita "showGigAskEmails()" nella console per vedere le email registrate');
-    console.log('🗑️ Digita "clearGigAskEmails()" per resettare la lista email');
     
     // 📊 Track caricamento pagina
     track('Page Load', {
@@ -407,6 +276,9 @@ function App() {
             </div>
             
             <div style={{display: 'flex', alignItems: 'center', gap: '2rem'}}>
+              <a href="#hero" style={{color: '#666', textDecoration: 'none', fontWeight: '500'}} onClick={() => scrollToSection('hero')}>
+                Home
+              </a>
               <a href="#come-funziona" style={{color: '#666', textDecoration: 'none', fontWeight: '500'}} onClick={() => scrollToSection('come-funziona')}>
                 Come funzionerà
               </a>
@@ -416,16 +288,17 @@ function App() {
               <a href="#faq" style={{color: '#666', textDecoration: 'none', fontWeight: '500'}} onClick={() => scrollToSection('faq')}>
                 FAQ
               </a>
-              <a href="#waiting-list" style={{color: '#666', textDecoration: 'none', fontWeight: '500'}} onClick={() => scrollToSection('waiting-list')}>
-                Unisciti alla lista
-        </a>
+              <a href="#referral" style={{color: '#666', textDecoration: 'none', fontWeight: '500'}} onClick={() => scrollToSection('referral')}>
+                🎁 Referral
+              </a>
+
       </div>
           </div>
         </div>
       </nav>
 
       {/* Hero Section con Logo centrale */}
-      <section style={{
+      <section id="hero" style={{
         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 25%, #ff6b35 50%, #f7931e 75%, #e91e63 100%)', 
         padding: '4rem 1rem', 
         color: 'white',
@@ -498,191 +371,18 @@ function App() {
               textShadow: '0 2px 10px rgba(0,0,0,0.2)'
             }}>
               Connetti chi cerca lavori occasionali con chi ha bisogno di aiuto. 
-              Semplice, veloce e sicuro. <strong>Sii tra i primi a provarla!</strong>
+              Semplice, veloce e sicuro.               <strong>Sii tra i primi a provarla!</strong>
             </p>
             
-            {/* Waiting List Form */}
-            <form onSubmit={handleEmailSubmit} style={{
-              background: 'rgba(255, 255, 255, 0.15)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              borderRadius: '2rem',
-              padding: '3rem',
+            {/* Waiting List Form con Supabase */}
+            <div style={{
               maxWidth: '600px',
               margin: '0 auto'
-            }} className="glass-clickable">
-              <div style={{
-                display: 'flex',
-                gap: '1rem',
-                flexWrap: 'wrap',
-                justifyContent: 'center',
-                marginBottom: '1.5rem' // 👈 Ridotto per fare spazio alla checkbox
-              }}>
-                <div style={{
-                  position: 'relative',
-                  flex: '1',
-                  minWidth: '300px',
-                  padding: '3px',
-                  borderRadius: '2rem',
-                  background: isSubmitted ? 
-                    'linear-gradient(135deg, #4caf50, #66bb6a)' : 
-                    'linear-gradient(135deg, #ff6b35, #f7931e, #e91e63)',
-                  transition: 'all 0.3s ease'
-                }}>
-                  <input
-                    type="email"
-                    placeholder="📧 Inserisci la tua email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={isSubmitting || isSubmitted}
-                    style={{
-                      width: '100%',
-                      padding: '1.5rem 2rem',
-                      borderRadius: '2rem',
-                      border: 'none',
-                      fontSize: '1.2rem',
-                      outline: 'none',
-                      opacity: 1,
-                      background: isSubmitted ? '#e8f5e8' : 'white',
-                      fontWeight: '500',
-                      color: '#2c3e50',
-                      boxSizing: 'border-box'
-                    }}
-                  />
-                </div>
-                <button 
-                  type="submit"
-                  disabled={isSubmitting || isSubmitted || !consentGiven} // 👈 Disabilitato se no consenso
-                  style={{
-                    backgroundColor: isSubmitted ? '#4caf50' : 'white', 
-                    background: isSubmitted ? 
-                      'linear-gradient(135deg, #4caf50 0%, #66bb6a 100%)' :
-                      'linear-gradient(135deg, #fff 0%, #f8f9fa 100%)',
-                    color: isSubmitted ? 'white' : '#ff6b35', 
-                    padding: '1.5rem 3rem', 
-                    borderRadius: '2rem', 
-                    fontSize: '1.2rem', 
-                    fontWeight: '700', 
-                    border: 'none', 
-                    cursor: (isSubmitting || isSubmitted || !consentGiven) ? 'not-allowed' : 'pointer', 
-                    boxShadow: '0 15px 40px rgba(255,255,255,0.4)',
-                    transition: 'all 0.3s ease',
-                    whiteSpace: 'nowrap',
-                    opacity: isSubmitted ? 0.9 : (!consentGiven ? 0.6 : 1) // 👈 Opacità ridotta se no consenso
-                  }}
-                >
-                  {isSubmitting ? '⏳ Invio...' : 
-                   isSubmitted ? '✅ Registrato!' : 
-                   '🎯 Unisciti ora'}
-                </button>
-              </div>
-              
-              {/* 👈 Checkbox per il consenso */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '0.8rem',
-                marginBottom: '2rem',
-                textAlign: 'left',
-                background: 'rgba(255, 255, 255, 0.1)',
-                padding: '1.2rem',
-                borderRadius: '1rem',
-                border: '1px solid rgba(255, 255, 255, 0.2)'
-              }}>
-                <input
-                  type="checkbox"
-                  id="consent-checkbox-hero"
-                  checked={consentGiven}
-                  onChange={(e) => setConsentGiven(e.target.checked)}
-                  disabled={isSubmitting || isSubmitted}
-                  style={{
-                    width: '1.2rem',
-                    height: '1.2rem',
-                    marginTop: '0.1rem',
-                    cursor: 'pointer',
-                    accentColor: '#ff6b35'
-                  }}
-                />
-                <label 
-                  htmlFor="consent-checkbox-hero" 
-                  style={{
-                    fontSize: '0.95rem',
-                    lineHeight: '1.4',
-                    cursor: 'pointer',
-                    color: 'rgba(255, 255, 255, 0.95)'
-                  }}
-                >
-                  Acconsento a ricevere comunicazioni informative e promozionali da <strong>GigAsk</strong>, ai sensi del Regolamento UE 2016/679 (GDPR). 
-                  Potrai annullare l'iscrizione in qualsiasi momento.
-                </label>
-              </div>
-              
-              {/* Messaggio di feedback */}
-              {submitMessage && (
-                <div style={{
-                  fontSize: '1rem',
-                  marginBottom: '2rem',
-                  textAlign: 'center',
-                  color: submitMessage.includes('❌') ? '#ff6b6b' : '#1a365d',
-                  fontWeight: '700',
-                  background: submitMessage.includes('❌') ? 'rgba(255, 107, 107, 0.1)' : 'rgba(26, 54, 93, 0.1)',
-                  padding: '1.2rem',
-                  borderRadius: '1rem',
-                  border: `2px solid ${submitMessage.includes('❌') ? 'rgba(255, 107, 107, 0.3)' : 'rgba(26, 54, 93, 0.3)'}`,
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
-                }}>
-                  {submitMessage}
-                </div>
-              )}
-              
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-around',
-                flexWrap: 'wrap',
-                gap: '2rem',
-                opacity: '0.9'
-              }}>
-                <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-                  <div className="icon-pulse">
-                    <EnvelopeIcon style={{width: '1.2rem', height: '1.2rem'}} />
-                  </div>
-                  <span>Niente spam</span>
-                </div>
-                <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-                  <div className="icon-pulse">
-                    <BellIcon style={{width: '1.2rem', height: '1.2rem'}} />
-                  </div>
-                  <span>Solo aggiornamenti importanti</span>
-                </div>
-                <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-                  <div className="icon-pulse">
-                    <StarIcon style={{width: '1.2rem', height: '1.2rem'}} />
-                  </div>
-                  <span>Accesso VIP</span>
-                </div>
-              </div>
-            </form>
-
-            {/* Stats */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'center',
-              gap: '2.5rem',
-              flexWrap: 'wrap',
-              marginTop: '2rem'
             }}>
-              <div style={{textAlign: 'center'}}>
-                <div style={{fontSize: '2.2rem', fontWeight: '800', marginBottom: '0.3rem', '--delay': '0s'}} className="stat-number">500+</div>
-                <div style={{opacity: '0.9', fontSize: '0.9rem'}}>Persone in lista</div>
-              </div>
-              <div style={{textAlign: 'center'}}>
-                <div style={{fontSize: '2.2rem', fontWeight: '800', marginBottom: '0.3rem', '--delay': '0.5s'}} className="stat-number">Q1 2024</div>
-                <div style={{opacity: '0.9', fontSize: '0.9rem'}}>Lancio previsto</div>
-              </div>
-              <div style={{textAlign: 'center'}}>
-                <div style={{fontSize: '2.2rem', fontWeight: '800', marginBottom: '0.3rem', '--delay': '1s'}} className="stat-number">🚀</div>
-                <div style={{opacity: '0.9', fontSize: '0.9rem'}}>Innovativo</div>
-              </div>
+              <WaitingListForm 
+                background="rgba(255, 255, 255, 0.15)"
+                showTitle={false}
+              />
             </div>
           </div>
         </div>
@@ -1289,10 +989,97 @@ function App() {
         </div>
       </section>
 
-      {/* Transizione Vantaggi → FAQ */}
+      {/* Transizione Vantaggi → Referral */}
       <div style={{
         height: '50px',
-        background: 'linear-gradient(180deg, rgba(252,228,236,0.5) 0%, rgba(248,250,252,0.7) 50%, rgba(227,242,253,0.8) 100%)',
+        background: 'linear-gradient(180deg, rgba(252,228,236,0.5) 0%, rgba(255,193,7,0.3) 50%, rgba(255,152,0,0.2) 100%)',
+        position: 'relative',
+        zIndex: 1
+      }}></div>
+
+      {/* Sistema Referral */}
+      <section id="referral" style={{
+        ...sectionStyle,
+        background: 'linear-gradient(135deg, rgba(255,193,7,0.08) 0%, rgba(255,152,0,0.06) 50%, rgba(255,255,255,0.95) 100%)', 
+        position: 'relative',
+        overflow: 'hidden'
+      }} className="animate-section">
+        <div style={containerStyle}>
+          <h2 style={{
+            fontSize: '3rem', 
+            fontWeight: '800', 
+            textAlign: 'center', 
+            marginBottom: '1rem',
+            ...gradientText
+          }}>
+            🎁 Invita amici e guadagna punti
+          </h2>
+          <p style={{
+            fontSize: '1.3rem',
+            color: '#666',
+            textAlign: 'center',
+            marginBottom: '3rem',
+            maxWidth: '600px',
+            margin: '0 auto 3rem'
+          }}>
+            Ottieni <strong>10 punti</strong> per l'iscrizione e <strong>30 punti bonus</strong> per ogni amico invitato
+          </p>
+
+          <div style={{
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+            gap: '2rem',
+            marginBottom: '3rem'
+          }}>
+            <div style={{
+              ...cardStyle,
+              textAlign: 'center'
+            }} className="card-hover">
+              <div style={{fontSize: '3rem', marginBottom: '1rem'}}>🚀</div>
+              <h3 style={{fontSize: '1.5rem', fontWeight: '600', marginBottom: '0.8rem', color: '#333'}}>
+                Accesso prioritario
+              </h3>
+              <p style={{color: '#666', lineHeight: '1.6'}}>
+                Più punti hai, prima potrai usare l'app
+              </p>
+            </div>
+
+            <div style={{
+              ...cardStyle,
+              textAlign: 'center'
+            }} className="card-hover">
+              <div style={{fontSize: '3rem', marginBottom: '1rem'}}>💰</div>
+              <h3 style={{fontSize: '1.5rem', fontWeight: '600', marginBottom: '0.8rem', color: '#333'}}>
+                Crediti gratuiti
+              </h3>
+              <p style={{color: '#666', lineHeight: '1.6'}}>
+                Converti i punti in crediti per i tuoi primi Gig
+              </p>
+            </div>
+          </div>
+
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(255,107,53,0.1) 0%, rgba(247,147,30,0.08) 100%)',
+            borderRadius: '1.5rem',
+            padding: '2rem',
+            textAlign: 'center',
+            border: '1px solid rgba(255,107,53,0.2)'
+          }}>
+            <p style={{
+              fontSize: '1.1rem',
+              color: '#666',
+              margin: '0'
+            }}>
+              💡 Dopo l'iscrizione riceverai il tuo link personale da condividere
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Transizione Referral → FAQ */}
+      <div style={{
+        height: '50px',
+        background: 'linear-gradient(180deg, rgba(255,193,7,0.2) 0%, rgba(248,250,252,0.7) 50%, rgba(227,242,253,0.8) 100%)',
         position: 'relative',
         zIndex: 1
       }}></div>
@@ -1309,62 +1096,62 @@ function App() {
 
         <div style={containerStyle}>
           <div style={{position: 'relative', zIndex: 2}}>
-            <h2 style={{
-              fontSize: '3rem', 
-              fontWeight: '800', 
-              textAlign: 'center', 
-              marginBottom: '1rem',
-              ...gradientText
-            }}>
-              Domande Frequenti
-            </h2>
-            <p style={{
-              fontSize: '1.3rem',
-              color: '#666',
-              textAlign: 'center',
-              marginBottom: '4rem',
-              maxWidth: '600px',
-              margin: '0 auto 4rem'
-            }}>
-              Tutto quello che devi sapere su GigAsk
-            </p>
+          <h2 style={{
+            fontSize: '3rem', 
+            fontWeight: '800', 
+            textAlign: 'center', 
+            marginBottom: '1rem',
+            ...gradientText
+          }}>
+            Domande Frequenti
+          </h2>
+          <p style={{
+            fontSize: '1.3rem',
+            color: '#666',
+            textAlign: 'center',
+            marginBottom: '4rem',
+            maxWidth: '600px',
+            margin: '0 auto 4rem'
+          }}>
+            Tutto quello che devi sapere su GigAsk
+          </p>
 
-            <div style={{
+          <div style={{
               maxWidth: '900px',
-              margin: '0 auto',
-              display: 'flex',
-              flexDirection: 'column',
+            margin: '0 auto',
+            display: 'flex',
+            flexDirection: 'column',
               gap: '1.5rem'
-            }}>
-              {faqData.map((item, index) => (
+          }}>
+            {faqData.map((item, index) => (
                 <div key={index} data-faq-index={index} style={{
                   background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%)',
                   borderRadius: '1.5rem',
                   boxShadow: '0 15px 40px rgba(0,0,0,0.12)',
                   border: `2px solid ${item.color}15`,
-                  overflow: 'hidden',
+                overflow: 'hidden',
                   transition: 'all 0.3s ease',
                   backdropFilter: 'blur(10px)'
                 }} className="faq-card">
-                  {/* Question - Clickable */}
-                  <div 
-                    onClick={() => toggleFAQ(index)}
-                    style={{
+                {/* Question - Clickable */}
+                <div 
+                  onClick={() => toggleFAQ(index)}
+                  style={{
                       padding: '2rem',
-                      cursor: 'pointer',
-                      display: 'flex',
+                    cursor: 'pointer',
+                    display: 'flex',
                       alignItems: 'flex-start',
                       gap: '1rem',
-                      transition: 'all 0.3s ease',
+                    transition: 'all 0.3s ease',
                       background: openFAQ === index ? `${item.color}08` : 'transparent',
                       position: 'relative'
-                    }}
-                    className="faq-question"
-                  >
+                  }}
+                  className="faq-question"
+                >
                     {/* Emoji e Testo */}
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
                       gap: '1rem',
                       flex: 1,
                       minWidth: 0
@@ -1381,13 +1168,13 @@ function App() {
                         boxShadow: `0 8px 20px ${item.color}30`,
                         flexShrink: 0,
                         position: 'relative'
-                      }}>
-                        <span style={{
+                  }}>
+                    <span style={{
                           position: 'absolute',
                           top: '50%',
                           left: '50%',
                           transform: 'translate(-50%, -50%)',
-                          fontSize: '1.2rem',
+                      fontSize: '1.2rem',
                           lineHeight: 1
                         }}>
                           {item.emoji}
@@ -1396,13 +1183,13 @@ function App() {
                       <h3 style={{
                         fontSize: '1.3rem',
                         fontWeight: '700',
-                        margin: 0,
+                      margin: 0,
                         color: '#1a1a1a',
                         lineHeight: '1.4'
-                      }}>
-                        {item.question}
-                      </h3>
-                    </div>
+                    }}>
+                      {item.question}
+                    </h3>
+                  </div>
                     
                     {/* Freccia - Posizione fissa */}
                     <div style={{
@@ -1413,274 +1200,66 @@ function App() {
                       justifyContent: 'center',
                       borderRadius: '50%',
                       background: `linear-gradient(135deg, ${item.color}15, ${item.color}08)`,
-                      transition: 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                      transform: openFAQ === index ? 'rotate(180deg) scale(1.05)' : 'rotate(0deg) scale(1)',
+                      transition: 'transform 0.25s ease-out',
+                      transform: openFAQ === index ? 'rotate(180deg)' : 'rotate(0deg)',
                       flexShrink: 0,
-                      boxShadow: openFAQ === index ? `0 4px 15px ${item.color}25` : '0 2px 8px rgba(0,0,0,0.1)',
                       position: 'relative'
                     }}>
-                      <ChevronDownIcon 
-                        style={{
+                  <ChevronDownIcon 
+                    style={{
                           width: '1.2rem',
                           height: '1.2rem',
-                          color: item.color,
+                      color: item.color,
                           strokeWidth: 2.5,
-                          transition: 'all 0.4s ease',
                           position: 'absolute',
                           top: '50%',
                           left: '50%',
                           transform: 'translate(-50%, -50%)'
-                        }}
-                      />
+                    }}
+                  />
                     </div>
-                  </div>
+                </div>
 
-                  {/* Answer - Expandable */}
+                {/* Answer - Expandable */}
+                <div style={{
+                    maxHeight: openFAQ === index ? '600px' : '0',
+                  overflow: 'hidden',
+                    transition: 'max-height 0.3s ease-out'
+                }}>
                   <div style={{
-                    maxHeight: openFAQ === index ? '500px' : '0',
-                    overflow: 'hidden',
-                    transition: 'max-height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s',
-                    opacity: openFAQ === index ? 1 : 0
-                  }}>
-                    <div style={{
                       padding: '0 2rem 2rem 2rem',
                       borderTop: `1px solid ${item.color}20`,
-                      marginTop: '1rem',
-                      transform: openFAQ === index ? 'translateY(0)' : 'translateY(-10px)',
-                      transition: 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s'
+                      marginTop: '1rem'
                     }}>
                       <div style={{
                         background: `linear-gradient(135deg, ${item.color}05, transparent)`,
                         borderRadius: '1rem',
                         padding: '1.5rem',
                         marginTop: '1rem',
-                        border: `1px solid ${item.color}10`,
-                        transform: openFAQ === index ? 'scale(1)' : 'scale(0.98)',
-                        transition: 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s'
-                      }}>
-                        <p style={{
+                        border: `1px solid ${item.color}10`
+                  }}>
+                    <p style={{
                           color: '#555', 
                           lineHeight: '1.7', 
                           fontSize: '1.05rem',
                           margin: 0,
-                          fontWeight: '400',
-                          opacity: openFAQ === index ? 1 : 0,
-                          transition: 'opacity 0.4s ease 0.4s'
-                        }}>
-                          {item.answer}
-                        </p>
+                          fontWeight: '400'
+                    }}>
+                      {item.answer}
+                    </p>
                       </div>
-                    </div>
                   </div>
                 </div>
-              ))}
+              </div>
+            ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Transizione FAQ → Waiting List */}
-      <div style={{
-        height: '70px',
-        background: 'linear-gradient(180deg, rgba(252,228,236,0.6) 0%, rgba(118,75,162,0.2) 50%, rgba(102,126,234,0.4) 100%)',
-        position: 'relative',
-        zIndex: 1
-      }}></div>
 
-      {/* Waiting List CTA Section */}
-      <section id="waiting-list" style={{
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 25%, #ff6b35 50%, #f7931e 75%, #e91e63 100%)', 
-        padding: '5rem 1rem', 
-        color: 'white',
-        position: 'relative',
-        overflow: 'hidden'
-      }} className="parallax-bg animated-gradient animate-section">
-        <div style={containerStyle}>
-          <div style={{textAlign: 'center', position: 'relative', zIndex: 2}}>
-            <h2 style={{
-              fontSize: '3.5rem', 
-              fontWeight: '800', 
-              marginBottom: '2rem',
-              textShadow: '0 4px 20px rgba(0,0,0,0.3)'
-            }}>
-              Non perdere il lancio!
-            </h2>
-            <p style={{
-              fontSize: '1.4rem', 
-              marginBottom: '3rem', 
-              opacity: '0.95', 
-              maxWidth: '40rem', 
-              margin: '0 auto 3rem',
-              textShadow: '0 2px 10px rgba(0,0,0,0.2)'
-            }}>
-              Unisciti alla waiting list e ricevi accesso esclusivo in anteprima. 
-              <strong>Sii tra i primi a scoprire GigAsk!</strong>
-            </p>
-            
-            {/* Large Waiting List Form */}
-            <form onSubmit={handleEmailSubmit} style={{
-              background: 'rgba(255, 255, 255, 0.15)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              borderRadius: '2rem',
-              padding: '3rem',
-              maxWidth: '600px',
-              margin: '0 auto'
-            }} className="glass-clickable">
-              <div style={{
-                display: 'flex',
-                gap: '1rem',
-                flexWrap: 'wrap',
-                justifyContent: 'center',
-                marginBottom: '1.5rem' // 👈 Ridotto per fare spazio alla checkbox
-              }}>
-                <div style={{
-                  position: 'relative',
-                  flex: '1',
-                  minWidth: '300px',
-                  padding: '3px',
-                  borderRadius: '2rem',
-                  background: isSubmitted ? 
-                    'linear-gradient(135deg, #4caf50, #66bb6a)' : 
-                    'linear-gradient(135deg, #ff6b35, #f7931e, #e91e63)',
-                  transition: 'all 0.3s ease'
-                }}>
-                  <input
-                    type="email"
-                    placeholder="📧 Inserisci la tua email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={isSubmitting || isSubmitted}
-                    style={{
-                      width: '100%',
-                      padding: '1.5rem 2rem',
-                      borderRadius: '2rem',
-                      border: 'none',
-                      fontSize: '1.2rem',
-                      outline: 'none',
-                      opacity: 1,
-                      background: isSubmitted ? '#e8f5e8' : 'white',
-                      fontWeight: '500',
-                      color: '#2c3e50',
-                      boxSizing: 'border-box'
-                    }}
-                  />
-                </div>
-                <button 
-                  type="submit"
-                  disabled={isSubmitting || isSubmitted || !consentGiven} // 👈 Disabilitato se no consenso
-                  style={{
-                    backgroundColor: isSubmitted ? '#4caf50' : 'white', 
-                    background: isSubmitted ? 
-                      'linear-gradient(135deg, #4caf50 0%, #66bb6a 100%)' :
-                      'linear-gradient(135deg, #fff 0%, #f8f9fa 100%)',
-                    color: isSubmitted ? 'white' : '#ff6b35', 
-                    padding: '1.5rem 3rem', 
-                    borderRadius: '2rem', 
-                    fontSize: '1.2rem', 
-                    fontWeight: '700', 
-                    border: 'none', 
-                    cursor: (isSubmitting || isSubmitted || !consentGiven) ? 'not-allowed' : 'pointer', 
-                    boxShadow: '0 15px 40px rgba(255,255,255,0.4)',
-                    transition: 'all 0.3s ease',
-                    whiteSpace: 'nowrap',
-                    opacity: isSubmitted ? 0.9 : (!consentGiven ? 0.6 : 1) // 👈 Opacità ridotta se no consenso
-                  }}
-                >
-                  {isSubmitting ? '⏳ Invio...' : 
-                   isSubmitted ? '✅ Registrato!' : 
-                   '🎯 Unisciti ora'}
-                </button>
-              </div>
-              
-              {/* 👈 Checkbox per il consenso */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '0.8rem',
-                marginBottom: '2rem',
-                textAlign: 'left',
-                background: 'rgba(255, 255, 255, 0.1)',
-                padding: '1.2rem',
-                borderRadius: '1rem',
-                border: '1px solid rgba(255, 255, 255, 0.2)'
-              }}>
-                <input
-                  type="checkbox"
-                  id="consent-checkbox-waiting"
-                  checked={consentGiven}
-                  onChange={(e) => setConsentGiven(e.target.checked)}
-                  disabled={isSubmitting || isSubmitted}
-                  style={{
-                    width: '1.2rem',
-                    height: '1.2rem',
-                    marginTop: '0.1rem',
-                    cursor: 'pointer',
-                    accentColor: '#ff6b35'
-                  }}
-                />
-                <label 
-                  htmlFor="consent-checkbox-waiting" 
-                  style={{
-                    fontSize: '0.95rem',
-                    lineHeight: '1.4',
-                    cursor: 'pointer',
-                    color: 'rgba(255, 255, 255, 0.95)'
-                  }}
-                >
-                  Acconsento a ricevere comunicazioni informative e promozionali da <strong>GigAsk</strong>, ai sensi del Regolamento UE 2016/679 (GDPR). 
-                  Potrai annullare l'iscrizione in qualsiasi momento.
-                </label>
-              </div>
-              
-              {/* Messaggio di feedback */}
-              {submitMessage && (
-                <div style={{
-                  fontSize: '1rem',
-                  marginBottom: '2rem',
-                  textAlign: 'center',
-                  color: submitMessage.includes('❌') ? '#ff6b6b' : '#1a365d',
-                  fontWeight: '700',
-                  background: submitMessage.includes('❌') ? 'rgba(255, 107, 107, 0.1)' : 'rgba(26, 54, 93, 0.1)',
-                  padding: '1.2rem',
-                  borderRadius: '1rem',
-                  border: `2px solid ${submitMessage.includes('❌') ? 'rgba(255, 107, 107, 0.3)' : 'rgba(26, 54, 93, 0.3)'}`,
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
-                }}>
-                  {submitMessage}
-                </div>
-              )}
-              
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-around',
-                flexWrap: 'wrap',
-                gap: '2rem',
-                opacity: '0.9'
-              }}>
-                <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-                  <div className="icon-pulse">
-                    <EnvelopeIcon style={{width: '1.2rem', height: '1.2rem'}} />
-                  </div>
-                  <span>Niente spam</span>
-                </div>
-                <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-                  <div className="icon-pulse">
-                    <BellIcon style={{width: '1.2rem', height: '1.2rem'}} />
-                  </div>
-                  <span>Solo aggiornamenti importanti</span>
-                </div>
-                <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-                  <div className="icon-pulse">
-                    <StarIcon style={{width: '1.2rem', height: '1.2rem'}} />
-                  </div>
-                  <span>Accesso VIP</span>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      </section>
+
+
 
       {/* Footer con Logo */}
       <footer style={{
@@ -1906,7 +1485,7 @@ function App() {
           transform: translateY(-2px);
         }
         
-                  /* Gradient text hover effect */
+        /* Gradient text hover effect */
         .gradient-text-hover {
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           cursor: pointer;
@@ -2731,8 +2310,8 @@ function App() {
           to {
             max-height: 500px;
             opacity: 1;
-            transform: translateY(0);
-          }
+          transform: translateY(0);
+        }
         }
         
         /* Perfect icon centering - fallback per tutti i cerchi */

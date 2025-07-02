@@ -2,12 +2,18 @@
 
 * {
   font-family: 'Inter', system-ui, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-body {
+html, body {
   margin: 0;
   padding: 0;
   line-height: 1.6;
+  overflow-x: hidden;
+  width: 100%;
+  height: 100%;
 }
 
 /* Aggiungiamo gli stili per le animazioni che erano nel CSS */
@@ -59,4 +65,49 @@ body {
 .logo-hover:hover {
   transform: scale(1.02);
   transition: transform 0.3s ease;
+}
+
+/* Nascondi la navbar su mobile */
+@media (max-width: 768px) {
+  .desktop-navbar {
+    display: none !important;
+  }
+}
+
+/* Spaziatura responsive - Riduci padding sezioni su mobile */
+@media (max-width: 768px) {
+  section {
+    padding: 3rem 1rem !important; /* Riduci da 5rem a 3rem su mobile */
+  }
+  
+  /* Card ottimizzate per mobile */
+  div[style*="gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))'"] {
+    grid-template-columns: 1fr !important; /* Una colonna su mobile */
+    gap: 1.5rem !important;
+  }
+  
+  /* Padding card ridotto su mobile */
+  div[style*="padding: '2rem 1.5rem'"] {
+    padding: 1.5rem 1rem !important;
+  }
+  
+  /* Titoli card più compatti su mobile */
+  h3[style*="fontSize: '1.8rem'"] {
+    font-size: 1.5rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  section {
+    padding: 2rem 0.8rem !important; /* Ulteriore riduzione su schermi piccoli */
+  }
+  
+  /* Massima compattezza per schermi molto piccoli */
+  div[style*="padding: '2rem 1.5rem'"] {
+    padding: 1.2rem 0.8rem !important;
+  }
+  
+  h3[style*="fontSize: '1.8rem'"] {
+    font-size: 1.3rem !important;
+  }
 }

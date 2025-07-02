@@ -59,8 +59,17 @@ function App() {
     padding: '0 1rem'
   };
 
+  // Sistema di spaziatura standardizzato
   const sectionStyle = {
-    padding: '4rem 1rem'
+    padding: '5rem 1rem' // Aumento padding standard per più respiro
+  };
+
+  const sectionSpacing = {
+    // Margini interni standardizzati
+    large: '4rem',      // Tra sezioni principali
+    medium: '3rem',     // Tra sottosezioni
+    small: '2rem',      // Tra elementi vicini
+    xsmall: '1.5rem'    // Tra testo e elementi
   };
 
   const cardStyle = {
@@ -258,7 +267,7 @@ function App() {
   return (
     <div style={{background: 'linear-gradient(135deg, #f8fafc 0%, #e3f2fd 50%, #fff3e0 100%)', minHeight: '100vh', fontFamily: 'system-ui, sans-serif'}}>
       
-      {/* Navbar con Logo */}
+      {/* Navbar con Logo - Nascosta su mobile */}
       <nav style={{
         background: 'rgba(255, 255, 255, 0.95)',
         backdropFilter: 'blur(10px)',
@@ -267,8 +276,9 @@ function App() {
         top: 0,
         zIndex: 1000,
         borderBottom: '1px solid rgba(255, 107, 53, 0.1)',
-        boxShadow: '0 2px 20px rgba(0,0,0,0.1)'
-      }}>
+        boxShadow: '0 2px 20px rgba(0,0,0,0.1)',
+        display: 'block'
+      }} className="desktop-navbar">
         <div style={containerStyle}>
           <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
             <div style={{display: 'flex', alignItems: 'center'}} className="logo-hover">
@@ -290,7 +300,7 @@ function App() {
               </a>
               <a href="#referral" style={{color: '#666', textDecoration: 'none', fontWeight: '500'}} onClick={() => scrollToSection('referral')}>
                 🎁 Referral
-              </a>
+        </a>
 
       </div>
           </div>
@@ -300,7 +310,7 @@ function App() {
       {/* Hero Section con Logo centrale */}
       <section id="hero" style={{
         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 25%, #ff6b35 50%, #f7931e 75%, #e91e63 100%)', 
-        padding: '4rem 1rem', 
+        padding: sectionStyle.padding, 
         color: 'white',
         position: 'relative',
         overflow: 'hidden'
@@ -383,14 +393,14 @@ function App() {
                 background="rgba(255, 255, 255, 0.15)"
                 showTitle={false}
               />
-            </div>
-          </div>
-        </div>
+              </div>
+                </div>
+                  </div>
       </section>
 
       {/* Transizione Hero → Come Funziona */}
       <div style={{
-        height: '60px',
+        height: '50px',
         background: 'linear-gradient(180deg, rgba(233,30,99,0.3) 0%, rgba(102,126,234,0.15) 50%, rgba(255,255,255,0.8) 100%)',
         position: 'relative',
         zIndex: 1
@@ -430,9 +440,9 @@ function App() {
             fontSize: '1.1rem',
             color: '#888',
             textAlign: 'center',
-            marginBottom: '4rem',
+            marginBottom: sectionSpacing.large,
             maxWidth: '600px',
-            margin: '0 auto 4rem'
+            margin: `0 auto ${sectionSpacing.large}`
           }}>
             Entrambi utilizzano la stessa app con funzionalità dedicate per ogni ruolo
           </p>
@@ -441,15 +451,15 @@ function App() {
           <div style={{
             background: 'linear-gradient(135deg, rgba(255,107,53,0.1) 0%, rgba(255,107,53,0.05) 100%)',
             borderRadius: '1.5rem',
-            padding: '2.5rem 2rem',
-            marginBottom: '3rem',
+            padding: '2rem 1.5rem',
+            marginBottom: sectionSpacing.small,
             border: '2px solid rgba(255,107,53,0.2)'
           }} className="card-hover">
             <h3 style={{
-              fontSize: '2rem',
+              fontSize: '1.8rem',
               fontWeight: '700',
               textAlign: 'center',
-              marginBottom: '2.5rem',
+              marginBottom: sectionSpacing.xsmall,
               background: 'linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -457,7 +467,7 @@ function App() {
             }}>
               👤 Per gli Asker 
             </h3>
-            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2.5rem'}}>
+            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: sectionSpacing.xsmall}}>
               {/* Step 1 Asker */}
               <div style={{textAlign: 'center', position: 'relative'}}>
                 <div style={{
@@ -566,14 +576,14 @@ function App() {
           <div style={{
             background: 'linear-gradient(135deg, rgba(30,136,229,0.1) 0%, rgba(30,136,229,0.05) 100%)',
             borderRadius: '1.5rem',
-            padding: '2.5rem 2rem',
+            padding: '2rem 1.5rem',
             border: '2px solid rgba(30,136,229,0.2)'
           }} className="card-hover">
             <h3 style={{
-              fontSize: '2rem',
+              fontSize: '1.8rem',
               fontWeight: '700',
               textAlign: 'center',
-              marginBottom: '2.5rem',
+              marginBottom: sectionSpacing.xsmall,
               background: 'linear-gradient(135deg, #1e88e5 0%, #00bcd4 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -581,7 +591,7 @@ function App() {
             }}>
               🛠️ Per i Gigger 
             </h3>
-            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2.5rem'}}>
+            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: sectionSpacing.xsmall}}>
               {/* Step 1 Gigger */}
               <div style={{textAlign: 'center', position: 'relative'}}>
                 <div style={{
@@ -598,14 +608,15 @@ function App() {
                   transition: 'all 0.3s ease',
                   position: 'relative'
                 }} className="step-icon-animation">
-                  <div className="icon-rotate" style={{
+                  <MagnifyingGlassIcon style={{
+                    width: '1.8rem', 
+                    height: '1.8rem', 
+                    color: 'white',
                     position: 'absolute',
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)'
-                  }}>
-                    <MagnifyingGlassIcon style={{width: '1.8rem', height: '1.8rem', color: 'white'}} />
-                  </div>
+                  }} />
                 </div>
                 <h4 style={{fontSize: '1.3rem', fontWeight: '700', marginBottom: '0.8rem', color: '#1a1a1a'}}>
                   1. Trova Gig interessanti
@@ -739,25 +750,25 @@ function App() {
             fontSize: '1.3rem',
             color: '#666',
             textAlign: 'center',
-            marginBottom: '4rem',
+            marginBottom: sectionSpacing.large,
             maxWidth: '600px',
-            margin: '0 auto 4rem'
+            margin: `0 auto ${sectionSpacing.large}`
           }}>
             Sarà la prima piattaforma italiana pensata specificamente per lavori occasionali
           </p>
-          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '3rem'}}>
+          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: sectionSpacing.small}}>
             {/* Per chi cerca aiuto */}
             <div style={{
               background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)',
-              padding: '2.5rem',
+              padding: '2rem 1.5rem',
               borderRadius: '1.5rem',
               boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
               border: '1px solid rgba(30,136,229,0.2)'
             }} className="card-hover">
               <h3 style={{
-                fontSize: '2rem', 
+                fontSize: '1.8rem', 
                 fontWeight: '700', 
-                marginBottom: '2rem', 
+                marginBottom: sectionSpacing.xsmall, 
                 textAlign: 'center',
                 background: 'linear-gradient(135deg, #1e88e5 0%, #9c27b0 100%)',
                 WebkitBackgroundClip: 'text',
@@ -766,7 +777,7 @@ function App() {
               }}>
                 Per chi cerca aiuto
               </h3>
-              <div style={{display: 'flex', flexDirection: 'column', gap: '1.8rem'}}>
+              <div style={{display: 'flex', flexDirection: 'column', gap: sectionSpacing.xsmall}}>
                 <div style={{display: 'flex', alignItems: 'center', textAlign: 'center', flexDirection: 'column'}}>
                   <div style={{
                     background: 'linear-gradient(135deg, #1e88e5 0%, #3f51b5 100%)',
@@ -869,15 +880,15 @@ function App() {
             {/* Per chi cerca lavoro */}
             <div style={{
               background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)',
-              padding: '2.5rem',
+              padding: '2rem 1.5rem',
               borderRadius: '1.5rem',
               boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
               border: '1px solid rgba(255,107,53,0.2)'
             }} className="card-hover">
               <h3 style={{
-                fontSize: '2rem', 
+                fontSize: '1.8rem', 
                 fontWeight: '700', 
-                marginBottom: '2rem', 
+                marginBottom: sectionSpacing.xsmall, 
                 textAlign: 'center',
                 background: 'linear-gradient(135deg, #ff6b35 0%, #e91e63 100%)',
                 WebkitBackgroundClip: 'text',
@@ -886,7 +897,7 @@ function App() {
               }}>
                 Per chi cerca lavoro
               </h3>
-              <div style={{display: 'flex', flexDirection: 'column', gap: '1.8rem'}}>
+              <div style={{display: 'flex', flexDirection: 'column', gap: sectionSpacing.xsmall}}>
                 <div style={{display: 'flex', alignItems: 'center', textAlign: 'center', flexDirection: 'column'}}>
                   <div style={{
                     background: 'linear-gradient(135deg, #ff6b35 0%, #ff7043 100%)',
@@ -1012,24 +1023,24 @@ function App() {
             marginBottom: '1rem',
             ...gradientText
           }}>
-            🎁 Invita amici e guadagna punti
+            Invita amici e guadagna punti
           </h2>
           <p style={{
             fontSize: '1.3rem',
             color: '#666',
             textAlign: 'center',
-            marginBottom: '3rem',
-            maxWidth: '600px',
-            margin: '0 auto 3rem'
+            marginBottom: sectionSpacing.medium,
+            maxWidth: '700px',
+            margin: `0 auto ${sectionSpacing.medium}`
           }}>
-            Ottieni <strong>10 punti</strong> per l'iscrizione e <strong>30 punti bonus</strong> per ogni amico invitato
+            Ottieni <strong>10 punti</strong> per l'iscrizione e <strong>30 punti bonus</strong> per ogni amico invitato. I punti sbloccano badge speciali per il tuo profilo!
           </p>
 
           <div style={{
             display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-            gap: '2rem',
-            marginBottom: '3rem'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
+            gap: sectionSpacing.small,
+            marginBottom: sectionSpacing.medium
           }}>
             <div style={{
               ...cardStyle,
@@ -1048,12 +1059,12 @@ function App() {
               ...cardStyle,
               textAlign: 'center'
             }} className="card-hover">
-              <div style={{fontSize: '3rem', marginBottom: '1rem'}}>💰</div>
+              <div style={{fontSize: '3rem', marginBottom: '1rem'}}>🏆</div>
               <h3 style={{fontSize: '1.5rem', fontWeight: '600', marginBottom: '0.8rem', color: '#333'}}>
-                Crediti gratuiti
+                Badge esclusivi
               </h3>
               <p style={{color: '#666', lineHeight: '1.6'}}>
-                Converti i punti in crediti per i tuoi primi Gig
+                Sblocca badge speciali per il tuo profilo e mostra il tuo status da early adopter
               </p>
             </div>
           </div>
@@ -1063,14 +1074,32 @@ function App() {
             borderRadius: '1.5rem',
             padding: '2rem',
             textAlign: 'center',
-            border: '1px solid rgba(255,107,53,0.2)'
+            border: '1px solid rgba(255,107,53,0.2)',
+            marginBottom: sectionSpacing.xsmall
           }}>
+            <h4 style={{
+              fontSize: '1.3rem',
+              fontWeight: '700',
+              color: '#333',
+              marginBottom: '1rem'
+            }}>
+              💡 Come funziona il sistema punti
+            </h4>
             <p style={{
               fontSize: '1.1rem',
               color: '#666',
-              margin: '0'
+              margin: '0 0 1rem 0',
+              lineHeight: '1.6'
             }}>
-              💡 Dopo l'iscrizione riceverai il tuo link personale da condividere
+              Dopo l'iscrizione riceverai il tuo <strong>link personale</strong> da condividere. I punti accumulati ora sbloccheranno <strong>badge esclusivi</strong> che potrai mostrare sul tuo profilo quando l'app sarà disponibile.
+            </p>
+            <p style={{
+              fontSize: '1rem',
+              color: '#888',
+              margin: '0',
+              lineHeight: '1.6'
+            }}>
+              📱 Una volta lanciata l'app, continuerai ad accumulare punti completando Gig e invitando nuovi utenti!
             </p>
           </div>
         </div>
@@ -1109,9 +1138,9 @@ function App() {
             fontSize: '1.3rem',
             color: '#666',
             textAlign: 'center',
-            marginBottom: '4rem',
+            marginBottom: sectionSpacing.large,
             maxWidth: '600px',
-            margin: '0 auto 4rem'
+            margin: `0 auto ${sectionSpacing.large}`
           }}>
             Tutto quello che devi sapere su GigAsk
           </p>
@@ -1264,7 +1293,7 @@ function App() {
       {/* Footer con Logo */}
       <footer style={{
         background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)', 
-        color: 'white', 
+        color: 'white',
         padding: '3rem 1rem'
       }} className="animate-section">
         <div style={containerStyle}>
@@ -1274,52 +1303,77 @@ function App() {
                 <GigAskLogo size={60} showText={false} />
               </div>
             </div>
-            <p style={{color: '#b0bec5', marginBottom: '2.5rem', fontSize: '1.2rem'}}>
+            <p style={{color: '#b0bec5', marginBottom: sectionSpacing.small, fontSize: '1.2rem'}}>
               La prima piattaforma italiana per lavori occasionali - In arrivo prossimamente
             </p>
             
             {/* Sezione Contatti */}
-            <div style={{
-              marginBottom: '2.5rem',
-              display: 'flex',
-              justifyContent: 'center',
-              gap: '3rem',
+              <div style={{
+              marginBottom: sectionSpacing.small,
+                display: 'flex',
+                justifyContent: 'center',
+              alignItems: 'center',
+              gap: sectionSpacing.small,
               flexWrap: 'wrap'
             }}>
-              <div style={{
+                <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.8rem',
-                color: '#b0bec5'
-              }}>
-                <div style={{
+                color: '#b0bec5',
+                padding: '0.8rem 1.2rem',
+                borderRadius: '1.2rem',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                transition: 'all 0.3s ease'
+                }}>
+              <div style={{
                   background: 'linear-gradient(135deg, #ff6b35, #e91e63)',
                   borderRadius: '50%',
                   padding: '0.6rem',
-                  display: 'flex',
+                display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  width: '2.5rem',
+                  height: '2.5rem',
+                  position: 'relative',
+                  flexShrink: 0
                 }}>
-                  <EnvelopeIcon style={{width: '1.2rem', height: '1.2rem', color: 'white'}} />
-                </div>
-                <div>
-                  <p style={{margin: 0, fontSize: '0.9rem', opacity: 0.8}}>Contattaci</p>
+                  <EnvelopeIcon style={{
+                    width: '1.2rem', 
+                    height: '1.2rem', 
+                    color: 'white',
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)'
+                  }} />
+                  </div>
+                <div style={{minWidth: 0}}>
+                  <p style={{margin: 0, fontSize: '0.9rem', opacity: 0.8, whiteSpace: 'nowrap'}}>Contattaci</p>
                   <a href="mailto:info@gigask.it" style={{
                     color: '#b0bec5',
                     textDecoration: 'none',
                     fontSize: '1.1rem',
-                    fontWeight: '500'
+                    fontWeight: '500',
+                    display: 'block',
+                    wordBreak: 'break-all'
                   }}>
                     info@gigask.it
                   </a>
                 </div>
-              </div>
+                  </div>
               
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.8rem',
-                color: '#b0bec5'
+                color: '#b0bec5',
+                padding: '0.8rem 1.2rem',
+                borderRadius: '1.2rem',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                transition: 'all 0.3s ease'
               }}>
                 <div style={{
                   background: 'linear-gradient(135deg, #1e88e5, #9c27b0)',
@@ -1327,23 +1381,36 @@ function App() {
                   padding: '0.6rem',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  width: '2.5rem',
+                  height: '2.5rem',
+                  position: 'relative',
+                  flexShrink: 0
                 }}>
-                  <span style={{fontSize: '1.2rem', color: 'white'}}>📞</span>
+                  <span style={{
+                    fontSize: '1.2rem', 
+                    color: 'white',
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)'
+                  }}>📞</span>
                 </div>
-                <div>
-                  <p style={{margin: 0, fontSize: '0.9rem', opacity: 0.8}}>Supporto</p>
+                <div style={{minWidth: 0}}>
+                  <p style={{margin: 0, fontSize: '0.9rem', opacity: 0.8, whiteSpace: 'nowrap'}}>Supporto</p>
                   <a href="tel:+393451234567" style={{
                     color: '#b0bec5',
                     textDecoration: 'none',
                     fontSize: '1.1rem',
-                    fontWeight: '500'
+                    fontWeight: '500',
+                    display: 'block',
+                    whiteSpace: 'nowrap'
                   }}>
                     +39 345 123 4567
                   </a>
+                  </div>
                 </div>
               </div>
-            </div>
             
             <p style={{color: '#78909c', fontSize: '1rem'}}>
               © 2024 GigAsk. Tutti i diritti riservati.
@@ -1354,6 +1421,43 @@ function App() {
 
       {/* CSS per animazioni */}
       <style>{`
+        /* 📱 MOBILE-FIRST GLOBAL OPTIMIZATIONS */
+        * {
+          box-sizing: border-box;
+          -webkit-tap-highlight-color: transparent;
+          touch-action: manipulation;
+        }
+        
+        html {
+          font-size: 16px;
+          -webkit-text-size-adjust: 100%;
+          -ms-text-size-adjust: 100%;
+          scroll-behavior: smooth;
+        }
+        
+        body {
+          overflow-x: hidden !important;
+          touch-action: manipulation;
+          -webkit-overflow-scrolling: touch;
+        }
+        
+        /* Touch-friendly elements */
+        button, input, select, textarea, a {
+          touch-action: manipulation;
+        }
+        
+        /* Prevent zoom on input focus (iOS Safari) */
+        @media screen and (max-width: 768px) {
+          input[type="email"],
+          input[type="text"],
+          input[type="password"],
+          input[type="number"],
+          textarea,
+          select {
+            font-size: 16px !important;
+          }
+        }
+
         @keyframes float {
           0%, 100% { transform: translateY(0px); }
           50% { transform: translateY(-20px); }
@@ -2236,45 +2340,115 @@ function App() {
           }
         }
         
-        /* Extra small screens */
-        @media screen and (max-width: 480px) {
-          section:first-of-type h1 {
-            font-size: 1.8rem !important;
-            padding: 0 0.5rem !important;
-          }
-          
-          section:first-of-type > div > div > p {
-            font-size: 0.9rem !important;
-            padding: 0 0.5rem !important;
-          }
-          
-          /* Form centering for extra small screens */
-          form {
-            margin: 0 auto !important;
-            padding: 1rem 0.8rem !important;
-            max-width: calc(100% - 0.5rem) !important;
+        /* 📱 TABLET OPTIMIZATION (768px - 1024px) */
+        @media screen and (min-width: 769px) and (max-width: 1024px) {
+          section h1 {
+            font-size: 2.8rem !important;
           }
           
           section h2 {
-            font-size: 1.6rem !important;
+            font-size: 2.5rem !important;
+          }
+          
+          div[style*="grid-template-columns"] {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 2rem !important;
+          }
+          
+          form {
+            max-width: 500px !important;
+          }
+        }
+        
+        /* 📱 EXTRA SMALL SCREENS (max 480px) */
+        @media screen and (max-width: 480px) {
+          /* Ultra compact navbar */
+          nav > div > div:last-child {
+            gap: 0.6rem !important;
+            font-size: 0.8rem !important;
+          }
+          
+          nav > div > div:last-child a {
+            white-space: nowrap !important;
+          }
+          
+          /* Hero ultra compact */
+          section:first-of-type h1 {
+            font-size: 1.9rem !important;
+            line-height: 1.1 !important;
+            padding: 0 0.8rem !important;
+          }
+          
+          section:first-of-type > div > div > p {
+            font-size: 1rem !important;
+            padding: 0 0.8rem !important;
+          }
+          
+          /* Form ultra compact */
+          form {
+            padding: 1.5rem 1rem !important;
+            border-radius: 1.2rem !important;
+            margin: 0 0.5rem !important;
+          }
+          
+          form input[type="email"] {
+            padding: 1rem 1.2rem !important;
+            font-size: 1rem !important;
+          }
+          
+          form button {
+            padding: 1rem 1.5rem !important;
+            font-size: 1rem !important;
+          }
+          
+          /* Sections ultra compact */
+          section h2 {
+            font-size: 1.8rem !important;
+            padding: 0 0.8rem !important;
+          }
+          
+          section p {
+            font-size: 0.95rem !important;
+            padding: 0 0.8rem !important;
+          }
+          
+          /* Cards ultra compact */
+          div[style*="padding: 2.5rem"] {
+            padding: 1.2rem 0.8rem !important;
+            border-radius: 1rem !important;
+          }
+          
+          /* FAQ ultra compact */
+          .faq-question {
+            padding: 1.2rem 0.8rem !important;
+          }
+          
+          .faq-question h3 {
+            font-size: 1rem !important;
+          }
+          
+          /* GDPR checkbox ultra compact */
+          form > div:nth-child(2) {
+            padding: 0.8rem !important;
+          }
+          
+          form > div:nth-child(2) label {
+            font-size: 0.8rem !important;
+            line-height: 1.2 !important;
+          }
+          
+          /* Container ultra compact */
+          div[style*="max-width: 72rem"] {
             padding: 0 0.5rem !important;
           }
           
-          div[style*="padding: 2.5rem"] {
-            padding: 1rem !important;
-          }
-          
-          /* Container centering for extra small screens */
-          section:first-of-type > div,
-          section:nth-last-child(2) > div {
-            padding: 0 0.25rem !important;
-            max-width: 100% !important;
+          /* Body overflow fix */
+          body, html {
             overflow-x: hidden !important;
           }
           
-          /* Body overflow fix for mobile */
-          body {
-            overflow-x: hidden !important;
+          * {
+            max-width: 100vw !important;
           }
         }
 
@@ -2299,7 +2473,7 @@ function App() {
         .faq-question:active {
           transform: scale(0.98);
         }
-        
+
         /* Smooth accordion animation enhanced */
         @keyframes accordionSlide {
           from {
@@ -2326,37 +2500,469 @@ function App() {
           transform: translate(-50%, -50%) !important;
         }
         
-        /* Text centering per emoji */
-        .faq-card span {
+        /* Text centering per emoji e icone in tutti i cerchi */
+        div[style*="borderRadius: '50%'"] {
+          position: relative !important;
           display: flex !important;
           align-items: center !important;
           justify-content: center !important;
-          text-align: center !important;
         }
         
-        /* Navbar responsive - nascondi su mobile */
+        div[style*="borderRadius: '50%'"] > * {
+          position: absolute !important;
+          top: 50% !important;
+          left: 50% !important;
+          transform: translate(-50%, -50%) !important;
+        }
+        
+        /* Prevent text overflow in all containers */
+        * {
+          word-wrap: break-word !important;
+          overflow-wrap: break-word !important;
+        }
+        
+        /* Ensure all containers fit within viewport */
+        .container, section, div {
+          max-width: 100vw !important;
+          box-sizing: border-box !important;
+        }
+        
+        /* 📱 MOBILE OPTIMIZATION */
         @media screen and (max-width: 768px) {
+          /* Remove white bar at top */
+          html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow-x: hidden !important;
+          }
+          
+          /* Mobile navbar - ultra compact */
           nav {
+            padding: 0.6rem 1rem !important;
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 1000 !important;
+          }
+          
+          nav > div {
+            padding: 0 !important;
+          }
+          
+          nav > div > div:last-child {
+            display: flex !important;
+            gap: 0.8rem !important;
+            overflow-x: auto !important;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+            padding: 0.2rem 0 !important;
+          }
+          
+          nav > div > div:last-child::-webkit-scrollbar {
             display: none !important;
           }
           
-          /* Rimuovi padding top dal body per compensare */
-          body {
-            padding-top: 0 !important;
+          nav > div > div:last-child a {
+            white-space: nowrap !important;
+            font-size: 0.85rem !important;
+            padding: 0.3rem 0.6rem !important;
+            border-radius: 0.8rem !important;
+            transition: all 0.3s ease !important;
+          }
+          
+          /* Hero section - ultra compact */
+          section:first-of-type {
+            padding: 1.5rem 1rem !important;
+          }
+          
+          section:first-of-type h1 {
+            font-size: 2rem !important;
+            line-height: 1.1 !important;
+            margin-bottom: 0.8rem !important;
+          }
+          
+          section:first-of-type > div > div > p {
+            font-size: 1rem !important;
+            margin-bottom: 1rem !important;
+          }
+          
+          /* All sections - ultra compact */
+          section {
+            padding: 2rem 1rem !important;
+          }
+          
+          section h2 {
+            font-size: 1.8rem !important;
+            line-height: 1.2 !important;
+            text-align: center !important;
+            margin-bottom: 0.8rem !important;
+          }
+          
+          section p {
+            font-size: 0.9rem !important;
+            text-align: center !important;
+            max-width: 100% !important;
+            margin-bottom: 1rem !important;
+          }
+          
+          /* Forms - ultra compact */
+          form {
+            max-width: 100% !important;
+            padding: 1.2rem 1rem !important;
+            margin: 0 0.5rem !important;
+            box-sizing: border-box !important;
+            border-radius: 1.2rem !important;
+          }
+          
+          form input[type="email"] {
+            width: 100% !important;
+            padding: 1rem 1.2rem !important;
+            font-size: 1rem !important;
+            box-sizing: border-box !important;
+            border-radius: 1.2rem !important;
+            margin-bottom: 0.8rem !important;
+          }
+          
+          form button {
+            width: 100% !important;
+            padding: 1rem 1.5rem !important;
+            font-size: 1rem !important;
+            box-sizing: border-box !important;
+            border-radius: 1.2rem !important;
+          }
+          
+          /* GDPR Checkbox - ultra compact */
+          form > div:nth-child(2) {
+            padding: 0.6rem !important;
+            margin-bottom: 1rem !important;
+            border-radius: 0.6rem !important;
+            gap: 0.5rem !important;
+          }
+          
+          form > div:nth-child(2) input[type="checkbox"] {
+            width: 0.9rem !important;
+            height: 0.9rem !important;
+            margin-top: 0.1rem !important;
+          }
+          
+          form > div:nth-child(2) label {
+            font-size: 0.8rem !important;
+            line-height: 1.25 !important;
+          }
+          
+          /* Grid layouts - ultra compact */
+          div[style*="grid-template-columns"] {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 1rem !important;
+          }
+          
+          /* Cards - ultra compact */
+          div[style*="padding: 2.5rem"] {
+            padding: 1.2rem 0.8rem !important;
+            margin: 0 0.5rem !important;
+            border-radius: 1rem !important;
+          }
+          
+          /* Step icons - ultra compact */
+          .step-icon-animation,
+          .benefit-icon-pulse {
+            width: 3rem !important;
+            height: 3rem !important;
+            margin: 0 auto 0.6rem !important;
+          }
+          
+          /* Step titles and descriptions - compact */
+          div[style*="textAlign: 'center'"] h4 {
+            font-size: 1.1rem !important;
+            margin-bottom: 0.5rem !important;
+            line-height: 1.2 !important;
+          }
+          
+          div[style*="textAlign: 'center'"] p {
+            font-size: 0.85rem !important;
+            line-height: 1.3 !important;
+            margin: 0 !important;
+          }
+          
+          /* Section titles - compact */
+          div[style*="fontSize: '2rem'"] h3 {
+            font-size: 1.5rem !important;
+            margin-bottom: 1rem !important;
+            line-height: 1.2 !important;
+          }
+          
+          /* Footer contacts - mobile layout */
+          footer div[style*="gap: '2rem'"] {
+            gap: 1rem !important;
+            flex-direction: column !important;
+            align-items: center !important;
+          }
+          
+          footer div[style*="padding: '0.8rem 1.2rem'"] {
+            padding: 0.6rem 1rem !important;
+            width: 100% !important;
+            max-width: 320px !important;
+            justify-content: flex-start !important;
+          }
+          
+          /* Benefits section - mobile layout */
+          div[style*="justifyContent: 'center'"][style*="gap: '1.5rem'"] {
+            gap: 0.8rem !important;
+            flex-direction: column !important;
+            align-items: center !important;
+          }
+          
+          div[style*="padding: '0.4rem 0.8rem'"][style*="whiteSpace: 'nowrap'"] {
+            padding: 0.4rem 0.6rem !important;
+            width: 100% !important;
+            max-width: 280px !important;
+            justify-content: center !important;
+          }
+          
+          div[style*="padding: '0.4rem 0.8rem'"] span[style*="whiteSpace: 'nowrap'"] {
+            font-size: 0.8rem !important;
           }
         }
-        
 
-
-        /* Smooth accordion animation */
-        @keyframes accordionSlide {
-          from {
-            max-height: 0;
-            opacity: 0;
+        /* 📱 EXTRA SMALL SCREENS (max 480px) - ULTRA COMPACT */
+        @media screen and (max-width: 480px) {
+          /* Ultra compact navbar */
+          nav {
+            padding: 0.5rem 0.8rem !important;
           }
-          to {
-            max-height: 200px;
-            opacity: 1;
+          
+          nav > div > div:last-child {
+            gap: 0.5rem !important;
+            font-size: 0.75rem !important;
+          }
+          
+          nav > div > div:last-child a {
+            padding: 0.25rem 0.5rem !important;
+            font-size: 0.75rem !important;
+          }
+          
+          /* Hero ultra compact */
+          section:first-of-type {
+            padding: 1rem 0.8rem !important;
+          }
+          
+          section:first-of-type h1 {
+            font-size: 1.7rem !important;
+            line-height: 1.1 !important;
+            margin-bottom: 0.6rem !important;
+          }
+          
+          section:first-of-type > div > div > p {
+            font-size: 0.9rem !important;
+            margin-bottom: 0.8rem !important;
+            line-height: 1.3 !important;
+          }
+          
+          /* Logo ultra compact */
+          section:first-of-type > div > div > div > div {
+            margin-bottom: 0.6rem !important;
+          }
+          
+          /* Form ultra compact */
+          form {
+            padding: 1rem 0.8rem !important;
+            border-radius: 1rem !important;
+            margin: 0 0.3rem !important;
+          }
+          
+          form input[type="email"] {
+            padding: 0.8rem 1rem !important;
+            font-size: 0.95rem !important;
+            margin-bottom: 0.6rem !important;
+          }
+          
+          form button {
+            padding: 0.8rem 1.2rem !important;
+            font-size: 0.95rem !important;
+          }
+          
+          /* GDPR ultra compact */
+          form > div:nth-child(2) {
+            padding: 0.5rem !important;
+            margin-bottom: 0.8rem !important;
+            gap: 0.4rem !important;
+          }
+          
+          form > div:nth-child(2) label {
+            font-size: 0.75rem !important;
+            line-height: 1.2 !important;
+          }
+          
+          /* Sections ultra compact */
+          section {
+            padding: 1.5rem 0.8rem !important;
+          }
+          
+          section h2 {
+            font-size: 1.6rem !important;
+            margin-bottom: 0.6rem !important;
+          }
+          
+          section p {
+            font-size: 0.85rem !important;
+            margin-bottom: 0.8rem !important;
+          }
+          
+          /* Cards ultra compact */
+          div[style*="padding: 2.5rem"] {
+            padding: 1rem 0.6rem !important;
+            border-radius: 0.8rem !important;
+            margin: 0 0.3rem !important;
+          }
+          
+          /* Step icons ultra compact */
+          .step-icon-animation,
+          .benefit-icon-pulse {
+            width: 2.5rem !important;
+            height: 2.5rem !important;
+            margin: 0 auto 0.5rem !important;
+          }
+          
+          /* Step titles ultra compact */
+          div[style*="textAlign: 'center'"] h4 {
+            font-size: 1rem !important;
+            margin-bottom: 0.4rem !important;
+          }
+          
+          div[style*="textAlign: 'center'"] p {
+            font-size: 0.8rem !important;
+            line-height: 1.25 !important;
+          }
+          
+          /* Section titles ultra compact */
+          div[style*="fontSize: '2rem'"] h3 {
+            font-size: 1.3rem !important;
+            margin-bottom: 0.8rem !important;
+          }
+          
+          /* Benefits ultra compact */
+          div[style*="flexDirection: 'column'"] {
+            gap: 0.8rem !important;
+          }
+          
+          div[style*="alignItems: 'center'"][style*="flexDirection: 'column'"] {
+            gap: 0.6rem !important;
+          }
+          
+          div[style*="alignItems: 'center'"][style*="flexDirection: 'column'"] h4 {
+            font-size: 0.9rem !important;
+            margin-bottom: 0.2rem !important;
+          }
+          
+          div[style*="alignItems: 'center'"][style*="flexDirection: 'column'"] p {
+            font-size: 0.75rem !important;
+            line-height: 1.2 !important;
+          }
+          
+          /* FAQ ultra compact */
+          .faq-question {
+            padding: 0.8rem 0.6rem !important;
+            gap: 0.5rem !important;
+          }
+          
+          .faq-question h3 {
+            font-size: 0.85rem !important;
+            line-height: 1.15 !important;
+          }
+          
+          /* FAQ circles ultra compact */
+          .faq-question > div:first-child > div:first-child {
+            width: 2rem !important;
+            height: 2rem !important;
+            font-size: 0.8rem !important;
+          }
+          
+          /* FAQ arrow ultra compact */
+          .faq-question > div:last-child {
+            width: 1.6rem !important;
+            height: 1.6rem !important;
+            min-width: 1.6rem !important;
+            min-height: 1.6rem !important;
+          }
+          
+          /* FAQ answers ultra compact */
+          .faq-question + div > div {
+            padding: 0 0.6rem 0.8rem 0.6rem !important;
+          }
+          
+          .faq-question + div > div > div {
+            padding: 0.6rem !important;
+            margin-top: 0.3rem !important;
+          }
+          
+          .faq-question + div > div > div > p {
+            font-size: 0.8rem !important;
+            line-height: 1.3 !important;
+          }
+          
+          /* Footer ultra compact */
+          footer {
+            padding: 1.2rem 0.8rem !important;
+          }
+          
+          footer > div > div:nth-child(2) {
+            gap: 1.2rem !important;
+            margin-bottom: 1.2rem !important;
+          }
+          
+          /* Success message ultra compact */
+          div[style*="marginTop: '1.5rem'"][style*="background: 'linear-gradient(135deg, #e8f5e9"] {
+            margin-top: 0.8rem !important;
+            padding: 0.8rem !important;
+          }
+          
+          /* Container ultra compact */
+          div[style*="max-width: 72rem"] {
+            padding: 0 0.6rem !important;
+          }
+          
+          /* Hidden brand badge on ultra small */
+          div[style*="Coming Soon"] {
+            font-size: 0.8rem !important;
+            padding: 0.4rem 0.8rem !important;
+          }
+          
+          /* Footer contacts ultra compact */
+          footer div[style*="gap: '2rem'"] {
+            gap: 0.8rem !important;
+          }
+          
+          footer div[style*="padding: '0.8rem 1.2rem'"] {
+            padding: 0.5rem 0.8rem !important;
+            max-width: 300px !important;
+          }
+          
+          footer div[style*="padding: '0.8rem 1.2rem'"] a {
+            font-size: 1rem !important;
+          }
+          
+          footer div[style*="padding: '0.8rem 1.2rem'"] p {
+            font-size: 0.8rem !important;
+          }
+          
+          /* Benefits ultra compact */
+          div[style*="padding: '0.4rem 0.8rem'"][style*="whiteSpace: 'nowrap'"] {
+            padding: 0.3rem 0.5rem !important;
+            max-width: 260px !important;
+          }
+          
+          div[style*="padding: '0.4rem 0.8rem'"] span[style*="whiteSpace: 'nowrap'"] {
+            font-size: 0.75rem !important;
+          }
+          
+          div[style*="padding: '0.4rem 0.8rem'"] div[style*="width: '1.4rem'"] {
+            width: 1.2rem !important;
+            height: 1.2rem !important;
+          }
+          
+          div[style*="padding: '0.4rem 0.8rem'"] svg {
+            width: 0.8rem !important;
+            height: 0.8rem !important;
           }
         }
       `}</style>

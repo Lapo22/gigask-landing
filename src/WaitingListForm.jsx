@@ -82,7 +82,8 @@ const WaitingListForm = ({
         referral_code: referralCode,
         referred_by: referredBy || null,
         points: 10,
-        joined_at: new Date().toISOString()
+        joined_at: new Date().toISOString(),
+        gdpr_accepted: true
       };
 
       // Inserisce il nuovo utente
@@ -200,12 +201,12 @@ const WaitingListForm = ({
         <div style={{
           display: 'flex',
           alignItems: 'flex-start',
-          gap: '0.8rem',
-          marginBottom: '1.5rem',
+          gap: '0.6rem',
+          marginBottom: '1.2rem',
           textAlign: 'left',
           background: background.includes('rgba(255, 255, 255, 0.15)') ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
-          padding: '1.2rem',
-          borderRadius: '1rem',
+          padding: '0.8rem',
+          borderRadius: '0.8rem',
           border: background.includes('rgba(255, 255, 255, 0.15)') ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(0, 0, 0, 0.1)'
         }}>
           <input
@@ -215,24 +216,24 @@ const WaitingListForm = ({
             onChange={(e) => setConsentGiven(e.target.checked)}
             disabled={isSubmitting}
             style={{
-              width: '1.2rem',
-              height: '1.2rem',
+              width: '1rem',
+              height: '1rem',
               marginTop: '0.1rem',
               cursor: 'pointer',
-              accentColor: '#ff6b35'
+              accentColor: '#ff6b35',
+              flexShrink: 0
             }}
           />
           <label 
             htmlFor="consent-checkbox" 
             style={{
-              fontSize: '0.95rem',
-              lineHeight: '1.4',
+              fontSize: '0.85rem',
+              lineHeight: '1.3',
               cursor: 'pointer',
               color: background.includes('rgba(255, 255, 255, 0.15)') ? 'rgba(255, 255, 255, 0.95)' : '#333'
             }}
           >
-            Acconsento a ricevere comunicazioni informative e promozionali da <strong>GigAsk</strong>, ai sensi del Regolamento UE 2016/679 (GDPR). 
-            Potrai annullare l'iscrizione in qualsiasi momento.
+            Acconsento a ricevere comunicazioni da <strong>GigAsk</strong> (GDPR). Cancellabile sempre.
           </label>
         </div>
 
@@ -373,29 +374,99 @@ const WaitingListForm = ({
       {showBenefits && (
         <div style={{
           display: 'flex',
-          justifyContent: 'space-around',
+          justifyContent: 'center',
+          alignItems: 'center',
           flexWrap: 'wrap',
-          gap: '2rem',
+          gap: '1.5rem',
           opacity: '0.9',
           marginTop: '2rem'
         }}>
-          <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem', color: background.includes('rgba(255, 255, 255, 0.15)') ? 'rgba(255, 255, 255, 0.9)' : '#666'}}>
-            <div className="icon-pulse">
-              <EnvelopeIcon style={{width: '1.2rem', height: '1.2rem'}} />
+          <div style={{
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '0.6rem', 
+            color: background.includes('rgba(255, 255, 255, 0.15)') ? 'rgba(255, 255, 255, 0.9)' : '#666',
+            padding: '0.4rem 0.8rem',
+            borderRadius: '1rem',
+            background: background.includes('rgba(255, 255, 255, 0.15)') ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+            border: background.includes('rgba(255, 255, 255, 0.15)') ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(0, 0, 0, 0.1)'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '1.4rem',
+              height: '1.4rem',
+              position: 'relative'
+            }} className="icon-pulse">
+              <EnvelopeIcon style={{
+                width: '1rem', 
+                height: '1rem',
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)'
+              }} />
             </div>
-            <span>Niente spam</span>
+            <span style={{fontSize: '0.85rem', fontWeight: '500', whiteSpace: 'nowrap'}}>Niente spam</span>
           </div>
-          <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem', color: background.includes('rgba(255, 255, 255, 0.15)') ? 'rgba(255, 255, 255, 0.9)' : '#666'}}>
-            <div className="icon-pulse">
-              <BellIcon style={{width: '1.2rem', height: '1.2rem'}} />
+          <div style={{
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '0.6rem', 
+            color: background.includes('rgba(255, 255, 255, 0.15)') ? 'rgba(255, 255, 255, 0.9)' : '#666',
+            padding: '0.4rem 0.8rem',
+            borderRadius: '1rem',
+            background: background.includes('rgba(255, 255, 255, 0.15)') ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+            border: background.includes('rgba(255, 255, 255, 0.15)') ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(0, 0, 0, 0.1)'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '1.4rem',
+              height: '1.4rem',
+              position: 'relative'
+            }} className="icon-pulse">
+              <BellIcon style={{
+                width: '1rem', 
+                height: '1rem',
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)'
+              }} />
             </div>
-            <span>Solo aggiornamenti importanti</span>
+            <span style={{fontSize: '0.85rem', fontWeight: '500', whiteSpace: 'nowrap'}}>Solo aggiornamenti importanti</span>
           </div>
-          <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem', color: background.includes('rgba(255, 255, 255, 0.15)') ? 'rgba(255, 255, 255, 0.9)' : '#666'}}>
-            <div className="icon-pulse">
-              <StarIcon style={{width: '1.2rem', height: '1.2rem'}} />
+          <div style={{
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '0.6rem', 
+            color: background.includes('rgba(255, 255, 255, 0.15)') ? 'rgba(255, 255, 255, 0.9)' : '#666',
+            padding: '0.4rem 0.8rem',
+            borderRadius: '1rem',
+            background: background.includes('rgba(255, 255, 255, 0.15)') ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+            border: background.includes('rgba(255, 255, 255, 0.15)') ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(0, 0, 0, 0.1)'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '1.4rem',
+              height: '1.4rem',
+              position: 'relative'
+            }} className="icon-pulse">
+              <StarIcon style={{
+                width: '1rem', 
+                height: '1rem',
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)'
+              }} />
             </div>
-            <span>Accesso VIP</span>
+            <span style={{fontSize: '0.85rem', fontWeight: '500', whiteSpace: 'nowrap'}}>Accesso VIP</span>
           </div>
         </div>
       )}

@@ -386,7 +386,7 @@ function App() {
             
             {/* Waiting List Form con Supabase */}
             <div style={{
-              maxWidth: '600px',
+              maxWidth: '750px',
               margin: '0 auto'
             }}>
               <WaitingListForm 

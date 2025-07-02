@@ -147,9 +147,9 @@ const WaitingListForm = ({
 
   return (
     <div style={{
-      maxWidth: '500px',
+      maxWidth: '650px',
       margin: '0 auto',
-      padding: '3rem',
+      padding: '0.5rem 1.5rem',
       background: background,
       borderRadius: '2rem',
       boxShadow: background.includes('rgba(255, 255, 255, 0.15)') ? 'none' : '0 15px 40px rgba(0,0,0,0.1)',
@@ -172,19 +172,19 @@ const WaitingListForm = ({
       )}
 
       <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '1.5rem' }}>
+        <div style={{ marginBottom: '0.3rem' }}>
           <input
             type="email"
-            placeholder="📧 Inserisci la tua email"
+            placeholder="Inserisci la tua email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={isSubmitting}
             style={{
               width: '100%',
-              padding: '1.5rem 2rem',
+              padding: '0.7rem 1.5rem',
               borderRadius: '2rem',
               border: background.includes('rgba(255, 255, 255, 0.15)') ? '2px solid rgba(255, 255, 255, 0.3)' : '2px solid #e0e0e0',
-              fontSize: '1.2rem',
+              fontSize: '1.1rem',
               outline: 'none',
               transition: 'border-color 0.3s ease',
               boxSizing: 'border-box',
@@ -201,11 +201,11 @@ const WaitingListForm = ({
         <div style={{
           display: 'flex',
           alignItems: 'flex-start',
-          gap: '0.6rem',
-          marginBottom: '1.2rem',
+          gap: '0.5rem',
+          marginBottom: '0.8rem',
           textAlign: 'left',
           background: background.includes('rgba(255, 255, 255, 0.15)') ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
-          padding: '0.8rem',
+          padding: '0.6rem',
           borderRadius: '0.8rem',
           border: background.includes('rgba(255, 255, 255, 0.15)') ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(0, 0, 0, 0.1)'
         }}>
@@ -227,8 +227,8 @@ const WaitingListForm = ({
           <label 
             htmlFor="consent-checkbox" 
             style={{
-              fontSize: '0.85rem',
-              lineHeight: '1.3',
+              fontSize: '0.8rem',
+              lineHeight: '1.2',
               cursor: 'pointer',
               color: background.includes('rgba(255, 255, 255, 0.15)') ? 'rgba(255, 255, 255, 0.95)' : '#333'
             }}
@@ -242,7 +242,7 @@ const WaitingListForm = ({
           disabled={isSubmitting || !consentGiven}
           style={{
             width: '100%',
-            padding: '1.5rem 3rem',
+            padding: '1rem 2rem',
             borderRadius: '2rem',
             border: 'none',
             background: (isSubmitting || !consentGiven) ? 
@@ -251,7 +251,7 @@ const WaitingListForm = ({
                 'linear-gradient(135deg, #fff 0%, #f8f9fa 100%)' :
                 'linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)'),
             color: (isSubmitting || !consentGiven) ? '#999' : (background.includes('rgba(255, 255, 255, 0.15)') ? '#ff6b35' : 'white'),
-            fontSize: '1.2rem',
+            fontSize: '1.1rem',
             fontWeight: '700',
             cursor: (isSubmitting || !consentGiven) ? 'not-allowed' : 'pointer',
             transition: 'all 0.3s ease',

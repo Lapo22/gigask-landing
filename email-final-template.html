@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benvenuto in GigAsk</title>
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            background: #ffffff;
+            margin: 0;
+            padding: 40px 20px;
+        }
+        
+        /* Container */
+        .email-wrapper {
+            max-width: 560px;
+            margin: 0 auto;
+            background: #ffffff;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            padding-bottom: 40px;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 40px;
+        }
+        
+        .brand-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #111827;
+            letter-spacing: -0.5px;
+        }
+        
+        .tagline {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+        
+        /* Main content */
+        .content {
+            margin-bottom: 48px;
+        }
+        
+        .greeting {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 24px;
+        }
+        
+        .main-text {
+            font-size: 16px;
+            color: #374151;
+            line-height: 1.7;
+            margin-bottom: 32px;
+        }
+        
+        /* Referral card */
+        .referral-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 32px 0;
+        }
+        
+        .referral-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #6b7280;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .referral-code {
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            font-size: 20px;
+            font-weight: 600;
+            color: #111827;
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 12px 16px;
+            text-align: center;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+        
+        .referral-note {
+            font-size: 14px;
+            color: #6b7280;
+            text-align: center;
+        }
+        
+        /* CTA */
+        .cta-section {
+            text-align: center;
+            margin: 40px 0;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: #111827;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            padding: 12px 24px;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .cta-button:hover {
+            background: #1f2937;
+        }
+        
+        /* Benefits - minimal */
+        .benefits {
+            margin: 32px 0;
+        }
+        
+        .benefits-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 16px;
+        }
+        
+        .benefit-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .benefit-item {
+            font-size: 15px;
+            color: #374151;
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .benefit-item::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #059669;
+            font-weight: 600;
+        }
+        
+        /* Footer */
+        .footer {
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 1px solid #e5e7eb;
+            text-align: center;
+        }
+        
+        .footer-text {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 16px;
+        }
+        
+        .footer-links {
+            margin-bottom: 24px;
+        }
+        
+        .footer-link {
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 14px;
+            margin: 0 16px;
+        }
+        
+        .footer-link:hover {
+            color: #111827;
+        }
+        
+        .unsubscribe {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+        
+        .unsubscribe a {
+            color: #9ca3af;
+            text-decoration: underline;
+        }
+        
+        /* Mobile */
+        @media only screen and (max-width: 600px) {
+            body {
+                padding: 20px 16px;
+            }
+            
+            .brand-name {
+                font-size: 20px;
+            }
+            
+            .greeting {
+                font-size: 16px;
+            }
+            
+            .main-text {
+                font-size: 15px;
+            }
+            
+            .referral-card {
+                padding: 20px;
+            }
+            
+            .referral-code {
+                font-size: 18px;
+                padding: 10px 12px;
+            }
+            
+            .cta-button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+            
+            .footer-link {
+                display: block;
+                margin: 8px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <!-- Header -->
+        <div class="header">
+            <div class="brand-name">GigAsk</div>
+            <div class="tagline">La piattaforma che connette chi cerca lavoro con chi ha bisogno di aiuto</div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content">
+            <div class="greeting">Ciao,</div>
+            
+            <div class="main-text">
+                Grazie per esserti iscritto alla waiting list di GigAsk. Sei ora in lista per accedere in anteprima alla piattaforma quando sarà pronta.
+            </div>
+            
+            <div class="main-text">
+                Nel frattempo, puoi guadagnare punti extra condividendo il tuo link referral con amici e colleghi interessati.
+            </div>
+            
+            <!-- Referral Card -->
+            <div class="referral-card">
+                <div class="referral-label">Il tuo codice referral</div>
+                <div class="referral-code">{{ params.referral_code }}</div>
+                <div class="referral-note">Condividi questo link per invitare altri</div>
+            </div>
+            
+            <!-- Benefits -->
+            <div class="benefits">
+                <div class="benefits-title">Cosa ottieni:</div>
+                <ul class="benefit-list">
+                    <li class="benefit-item">Accesso prioritario alla piattaforma</li>
+                    <li class="benefit-item">30 punti bonus per ogni invito accettato</li>
+                    <li class="benefit-item">Badge early adopter esclusivo</li>
+                </ul>
+            </div>
+            
+            <!-- CTA -->
+            <div class="cta-section">
+                <a href="https://localhost:5173/?ref={{ params.referral_code }}" class="cta-button">
+                    Condividi il tuo link
+                </a>
+            </div>
+            
+            <div class="main-text">
+                Ti aggiorneremo sui progressi e ti avviseremo non appena GigAsk sarà disponibile.
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-text">
+                Team GigAsk
+            </div>
+            
+            <div class="footer-links">
+                <a href="#" class="footer-link">Sito web</a>
+                <a href="#" class="footer-link">Instagram</a>
+                <a href="#" class="footer-link">LinkedIn</a>
+            </div>
+            
+            <div class="unsubscribe">
+                Non vuoi più ricevere questi aggiornamenti? <a href="#">Cancellati qui</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

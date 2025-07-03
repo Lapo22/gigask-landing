@@ -117,9 +117,66 @@ const WaitingListForm = ({
         }
       }
 
-      // Successo
+      // Successo Supabase - ora invia email tramite Brevo
       const referralLink = `${window.location.origin}/?ref=${referralCode}`;
-      setMessage(`success|${referralCode}|${referralLink}`);
+      
+      // Invio email tramite Brevo API
+      let emailStatus = 'success';
+      let emailErrorMessage = '';
+      
+      // Controlla se le variabili d'ambiente sono configurate
+      if (!import.meta.env.VITE_BREVO_API_KEY || !import.meta.env.VITE_BREVO_TEMPLATE_ID) {
+        console.error('❌ Variabili d\'ambiente Brevo mancanti!');
+        console.error('- VITE_BREVO_API_KEY:', import.meta.env.VITE_BREVO_API_KEY ? 'Configurata' : 'MANCANTE');
+        console.error('- VITE_BREVO_TEMPLATE_ID:', import.meta.env.VITE_BREVO_TEMPLATE_ID ? 'Configurata' : 'MANCANTE');
+        emailStatus = 'email_failed';
+        emailErrorMessage = 'Variabili d\'ambiente Brevo non configurate';
+      } else {
+        try {
+          console.log('🔄 Invio email tramite Brevo...');
+          
+          const brevoResponse = await fetch('https://api.brevo.com/v3/smtp/email', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'api-key': import.meta.env.VITE_BREVO_API_KEY
+            },
+            body: JSON.stringify({
+              to: [{ email: email }],
+              templateId: Number(import.meta.env.VITE_BREVO_TEMPLATE_ID),
+              params: {
+                referral_code: referralCode
+              }
+            })
+          });
+
+          if (!brevoResponse.ok) {
+            const errorText = await brevoResponse.text();
+            console.error('❌ Brevo API response error:', {
+              status: brevoResponse.status,
+              statusText: brevoResponse.statusText,
+              body: errorText
+            });
+            throw new Error(`Brevo API error ${brevoResponse.status}: ${brevoResponse.statusText}`);
+          }
+
+          const responseData = await brevoResponse.json();
+          console.log('✅ Email inviata con successo tramite Brevo:', responseData);
+          
+        } catch (emailError) {
+          console.error('❌ Errore invio email Brevo:', emailError);
+          emailStatus = 'email_failed';
+          emailErrorMessage = emailError.message;
+        }
+      }
+
+      // Imposta messaggio basato sullo stato dell'email
+      if (emailStatus === 'success') {
+        setMessage(`success|${referralCode}|${referralLink}|email_sent`);
+      } else {
+        setMessage(`success|${referralCode}|${referralLink}|email_failed`);
+      }
+      
       setMessageType('success');
       setConsentGiven(false);
 
@@ -147,9 +204,9 @@ const WaitingListForm = ({
 
   return (
     <div style={{
-      maxWidth: '650px',
+      maxWidth: window.innerWidth <= 768 ? '95%' : '650px',
       margin: '0 auto',
-      padding: '0.5rem 1.5rem',
+      padding: window.innerWidth <= 768 ? '2rem 1.5rem' : '2.2rem',
       background: background,
       borderRadius: '2rem',
       boxShadow: background.includes('rgba(255, 255, 255, 0.15)') ? 'none' : '0 15px 40px rgba(0,0,0,0.1)',
@@ -172,19 +229,19 @@ const WaitingListForm = ({
       )}
 
       <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '0.3rem' }}>
+        <div style={{ marginBottom: '1.5rem' }}>
           <input
             type="email"
-            placeholder="Inserisci la tua email"
+            placeholder="📧 Inserisci la tua email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={isSubmitting}
             style={{
               width: '100%',
-              padding: '0.7rem 1.5rem',
+              padding: '1.5rem 2rem',
               borderRadius: '2rem',
               border: background.includes('rgba(255, 255, 255, 0.15)') ? '2px solid rgba(255, 255, 255, 0.3)' : '2px solid #e0e0e0',
-              fontSize: '1.1rem',
+              fontSize: '1.2rem',
               outline: 'none',
               transition: 'border-color 0.3s ease',
               boxSizing: 'border-box',
@@ -201,13 +258,17 @@ const WaitingListForm = ({
         <div style={{
           display: 'flex',
           alignItems: 'flex-start',
-          gap: '0.5rem',
-          marginBottom: '0.8rem',
+          gap: '0.6rem',
+          marginBottom: '1.2rem',
           textAlign: 'left',
           background: background.includes('rgba(255, 255, 255, 0.15)') ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
-          padding: '0.6rem',
+          padding: '0.8rem',
           borderRadius: '0.8rem',
-          border: background.includes('rgba(255, 255, 255, 0.15)') ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(0, 0, 0, 0.1)'
+          border: background.includes('rgba(255, 255, 255, 0.15)') ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(0, 0, 0, 0.1)',
+          width: 'min(400px, calc(100% - 2rem))',
+          margin: '0 auto 1.2rem',
+          maxWidth: '100%',
+          boxSizing: 'border-box'
         }}>
           <input
             type="checkbox"
@@ -227,8 +288,8 @@ const WaitingListForm = ({
           <label 
             htmlFor="consent-checkbox" 
             style={{
-              fontSize: '0.8rem',
-              lineHeight: '1.2',
+              fontSize: '0.85rem',
+              lineHeight: '1.3',
               cursor: 'pointer',
               color: background.includes('rgba(255, 255, 255, 0.15)') ? 'rgba(255, 255, 255, 0.95)' : '#333'
             }}
@@ -241,8 +302,8 @@ const WaitingListForm = ({
           type="submit"
           disabled={isSubmitting || !consentGiven}
           style={{
-            width: '100%',
-            padding: '1rem 2rem',
+            width: 'min(400px, calc(100% - 2rem))',
+            padding: window.innerWidth <= 480 ? '1.2rem 2rem' : '1.5rem 3rem',
             borderRadius: '2rem',
             border: 'none',
             background: (isSubmitting || !consentGiven) ? 
@@ -251,13 +312,17 @@ const WaitingListForm = ({
                 'linear-gradient(135deg, #fff 0%, #f8f9fa 100%)' :
                 'linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)'),
             color: (isSubmitting || !consentGiven) ? '#999' : (background.includes('rgba(255, 255, 255, 0.15)') ? '#ff6b35' : 'white'),
-            fontSize: '1.1rem',
+            fontSize: window.innerWidth <= 480 ? '1.1rem' : '1.2rem',
             fontWeight: '700',
             cursor: (isSubmitting || !consentGiven) ? 'not-allowed' : 'pointer',
             transition: 'all 0.3s ease',
             boxShadow: (isSubmitting || !consentGiven) ? 'none' : (background.includes('rgba(255, 255, 255, 0.15)') ? '0 15px 40px rgba(255,255,255,0.4)' : '0 8px 20px rgba(255, 107, 53, 0.3)'),
             whiteSpace: 'nowrap',
-            opacity: !consentGiven ? 0.6 : 1
+            opacity: !consentGiven ? 0.6 : 1,
+            margin: '0 auto',
+            display: 'block',
+            maxWidth: '100%',
+            boxSizing: 'border-box'
           }}
         >
           {isSubmitting ? '⏳ Invio in corso...' : '🚀 Unisciti ora'}
@@ -281,7 +346,46 @@ const WaitingListForm = ({
             color: '#2e7d32',
             marginBottom: '1rem'
           }}>
-            Perfetto! Ecco il tuo link referral:
+            Perfetto! Sei stato registrato con successo!
+          </p>
+          
+          {/* Status email */}
+          {message.split('|')[3] === 'email_sent' && (
+            <div style={{
+              background: 'rgba(76, 175, 80, 0.1)',
+              border: '1px solid #4caf50',
+              borderRadius: '0.8rem',
+              padding: '0.8rem',
+              marginBottom: '1rem',
+              fontSize: '0.9rem',
+              color: '#2e7d32'
+            }}>
+              ✅ Email di benvenuto inviata con successo!
+            </div>
+          )}
+          
+          {message.split('|')[3] === 'email_failed' && (
+            <div style={{
+              background: 'rgba(255, 152, 0, 0.1)',
+              border: '1px solid #ff9800',
+              borderRadius: '0.8rem',
+              padding: '0.8rem',
+              marginBottom: '1rem',
+              fontSize: '0.9rem',
+              color: '#e65100'
+            }}>
+              ⚠️ Registrazione completata, ma l'email di benvenuto non è stata inviata.<br/>
+              <small>Controlla la console per maggiori dettagli sull'errore.</small>
+            </div>
+          )}
+          
+          <p style={{
+            fontSize: '1rem',
+            fontWeight: '600',
+            color: '#2e7d32',
+            marginBottom: '1rem'
+          }}>
+            Ecco il tuo link referral:
           </p>
           
           <div style={{
